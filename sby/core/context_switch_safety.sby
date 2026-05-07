@@ -1,0 +1,44 @@
+#===============================================================================
+# SymbiYosys: Context Switch Safety Proof
+# Module: rt_exception_handler
+# Properties: ECALL/EBREAK always request shadow bank swap;
+#             MRET/Illegal do NOT request shadow bank swap
+#===============================================================================
+
+[options]
+mode bmc
+depth 10
+engines smtbmc yices
+
+[script]
+read_verilog -sv rtl/core/rt_exception_handler.v
+prep -top rt_exception_handler
+chformal -early
+
+[files]
+rtl/core/rt_exception_handler.v
+
+[tasks]
+# Property 1: ECALL requests shadow swap
+check_ecall_shadow_swap:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        i_ecall |-> o_shadow_swap_req
+    );
+
+# Property 2: EBREAK requests shadow swap
+check_ebreak_shadow_swap:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        i_ebreak |-> o_shadow_swap_req
+    );
+
+# Property 3: MRET does NOT request shadow swap
+check_mret_no_swap:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_mret && !i_ecall && !i_ebreak) |-> !o_shadow_swap_req
+    );
+
+# Property 4: Illegal does NOT request shadow swap
+check_illegal_no_swap:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_illegal && !i_ecall && !i_ebreak) |-> !o_shadow_swap_req
+    );

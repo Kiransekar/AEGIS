@@ -1,0 +1,45 @@
+#===============================================================================
+# SymbiYosys: SMU Fault Aggregation
+# Module: smu
+# Properties: Fault latch persistence, safe-state trigger timing
+#===============================================================================
+
+[options]
+mode bmc
+depth 30
+engines smtbmc yices
+multiclock on
+
+[script]
+read_verilog -sv rtl/security/smu.v
+prep -top smu
+chformal -early
+
+[files]
+rtl/security/smu.v
+rtl/security/smu_fault_codes.vh
+
+[tasks]
+# Property 1: Fault latch persists until acknowledged
+check_fault_latch:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_fault_valid && !i_fault_ack) |-> ##1 o_fault_latched
+    );
+
+# Property 2: Safe-state triggered within 2 cycles of SPF threshold
+check_spf_trigger:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_fault_valid && o_fault_severity == 2'd1) |-> ##[1:2] o_safe_state_req
+    );
+
+# Property 3: Safe-state triggered by MPF immediately
+check_mpf_trigger:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_fault_valid && o_fault_severity == 2'd3) |-> ##[1:2] o_safe_state_req
+    );
+
+# Property 4: Acknowledge clears fault latch
+check_ack_clears:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        i_fault_ack |-> ##1 !o_fault_latched
+    );

@@ -1,0 +1,44 @@
+#===============================================================================
+# SymbiYosys: Power Safe-State Transition
+# Module: power_orchestrator
+# Properties: Safe-state trigger timing, irreversibility
+#===============================================================================
+
+[options]
+mode bmc
+depth 30
+engines smtbmc yices
+multiclock on
+
+[script]
+read_verilog -sv rtl/power/power_orchestrator.v
+prep -top power_orchestrator
+chformal -early
+
+[files]
+rtl/power/power_orchestrator.v
+
+[tasks]
+# Property 1: SMU safe-state request triggers SAFE_STATE within 2 cycles
+check_safe_state_trigger:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        i_smu_safe_req |-> ##[1:2] o_safe_state_active
+    );
+
+# Property 2: Safe-state is irreversible (only reset exits)
+check_safe_state_irreversible:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        o_safe_state_active |=> o_safe_state_active
+    );
+
+# Property 3: Isolation enabled during safe-state
+check_isolation_on_safe:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        o_safe_state_active |-> o_iso_en
+    );
+
+# Property 4: Power switch off during safe-state
+check_power_off_on_safe:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        o_safe_state_active |-> o_pwr_switch_n
+    );

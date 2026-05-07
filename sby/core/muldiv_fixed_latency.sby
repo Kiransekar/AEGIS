@@ -1,0 +1,37 @@
+#===============================================================================
+# SymbiYosys: MULDIV Fixed Latency Proof
+# Module: rt_muldiv
+# Properties: MUL completes in exactly 2 cycles; DIV in exactly 4 cycles
+#===============================================================================
+
+[options]
+mode bmc
+depth 10
+engines smtbmc yices
+
+[script]
+read_verilog -sv rtl/core/rt_muldiv.v
+prep -top rt_muldiv
+chformal -early
+
+[files]
+rtl/core/rt_muldiv.v
+
+[tasks]
+# Property 1: MUL (funct3[0:2] in {0,1,2,3}) completes in exactly 2 cycles
+check_mul_2cycle:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_valid && i_funct3 inside {3'h0, 3'h1, 3'h2, 3'h3}) |-> ##2 o_valid
+    );
+
+# Property 2: DIV (funct3[0:2] in {4,5,6,7}) completes in exactly 4 cycles
+check_div_4cycle:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_valid && i_funct3 inside {3'h4, 3'h5, 3'h6, 3'h7}) |-> ##4 o_valid
+    );
+
+# Property 3: No early valid before target cycles
+check_no_early_valid:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_valid && i_funct3 inside {3'h0, 3'h1, 3'h2, 3'h3}) |-> !o_valid until ##2 o_valid
+    );

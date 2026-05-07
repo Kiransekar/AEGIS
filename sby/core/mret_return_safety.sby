@@ -1,0 +1,44 @@
+#===============================================================================
+# SymbiYosys: MRET Return Safety Proof
+# Module: rt_exception_handler
+# Properties: MRET sets mret_valid and does NOT set trap_valid;
+#             MRET does NOT request shadow bank swap
+#===============================================================================
+
+[options]
+mode bmc
+depth 10
+engines smtbmc yices
+
+[script]
+read_verilog -sv rtl/core/rt_exception_handler.v
+prep -top rt_exception_handler
+chformal -early
+
+[files]
+rtl/core/rt_exception_handler.v
+
+[tasks]
+# Property 1: MRET always sets mret_valid
+check_mret_valid:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        i_mret |-> o_mret_valid
+    );
+
+# Property 2: MRET never sets trap_valid (it's a return, not a trap)
+check_mret_no_trap:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_mret && !i_ecall && !i_ebreak && !i_illegal) |-> !o_trap_valid
+    );
+
+# Property 3: MRET never requests shadow bank swap
+check_mret_no_shadow_swap:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_mret && !i_ecall && !i_ebreak) |-> !o_shadow_swap_req
+    );
+
+# Property 4: MRET return PC is current PC + 4
+check_mret_pc:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        i_mret |-> (o_mret_pc == i_current_pc + 32'd4)
+    );

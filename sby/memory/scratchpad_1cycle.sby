@@ -1,0 +1,35 @@
+#===============================================================================
+# SymbiYosys: Scratchpad 1-Cycle Latency Invariant
+# Module: scratchpad_ctrl
+# Properties: Read/write latency guarantees
+#===============================================================================
+
+[options]
+mode bmc
+depth 20
+engines smtbmc yices
+
+[script]
+read_verilog -sv rtl/memory/scratchpad_ctrl.v
+read_verilog -sv rtl/memory/scratchpad_bank.v
+read_verilog -sv rtl/memory/ecc_secdec_32.v
+prep -top scratchpad_ctrl
+chformal -early
+
+[files]
+rtl/memory/scratchpad_ctrl.v
+rtl/memory/scratchpad_bank.v
+rtl/memory/ecc_secdec_32.v
+
+[tasks]
+# Property 1: Read data valid 1 cycle after read enable
+check_read_latency:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_re && i_valid) |-> ##1 o_rdata_valid
+    );
+
+# Property 2: Controller always ready
+check_always_ready:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        o_ready
+    );

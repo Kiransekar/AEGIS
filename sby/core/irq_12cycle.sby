@@ -1,0 +1,57 @@
+#===============================================================================
+# SymbiYosys: Interrupt 12-Cycle Entry Proof
+# Module: aegis_rt_core (partial — IRQ entry path)
+# Properties: IRQ entry completes in exactly 12 cycles;
+#             Shadow bank swap occurs on IRQ entry
+#===============================================================================
+
+[options]
+mode bmc
+depth 20
+engines smtbmc yices
+
+[script]
+read_verilog -sv -defer \
+    rtl/core/rt_decoder.v \
+    rtl/core/rv32c_expander.v \
+    rtl/core/rt_register_file.v \
+    rtl/core/rt_alu.v \
+    rtl/core/rt_fpu.v \
+    rtl/core/rt_muldiv.v \
+    rtl/core/rt_atomic.v \
+    rtl/core/rt_watchdog.v \
+    rtl/core/rt_branch_unit.v \
+    rtl/core/rt_csr_unit.v \
+    rtl/core/rt_pipeline_if.v \
+    rtl/core/rt_pipeline_controller.v \
+    rtl/core/xdrone_decoder.v \
+    rtl/core/xdrone_dispatcher.v \
+    rtl/core/rt_interrupt_controller.v \
+    rtl/core/aegis_rt_core.v
+prep -top aegis_rt_core
+chformal -early
+
+[files]
+rtl/core/rt_decoder.v
+rtl/core/rv32c_expander.v
+rtl/core/rt_register_file.v
+rtl/core/rt_alu.v
+rtl/core/rt_fpu.v
+rtl/core/rt_muldiv.v
+rtl/core/rt_atomic.v
+rtl/core/rt_watchdog.v
+rtl/core/rt_branch_unit.v
+rtl/core/rt_csr_unit.v
+rtl/core/rt_pipeline_if.v
+rtl/core/rt_pipeline_controller.v
+rtl/core/xdrone_decoder.v
+rtl/core/xdrone_dispatcher.v
+rtl/core/rt_interrupt_controller.v
+rtl/core/aegis_rt_core.v
+
+[tasks]
+# Property 1: IRQ entry state transitions to FETCH in exactly 12 cycles
+check_irq_12cycle:
+    cover property (@(posedge i_clk) disable iff (!i_rst_n)
+        pipeline_state == 3'd7 ##12 pipeline_state == 3'd0
+    );

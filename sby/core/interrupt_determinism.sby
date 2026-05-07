@@ -1,0 +1,38 @@
+#===============================================================================
+# SymbiYosys: Interrupt Determinism Proof
+# Module: rt_interrupt_controller
+# Properties: 12-cycle entry guarantee, no data-dependent timing
+#===============================================================================
+
+[options]
+mode bmc
+depth 30
+engines smtbmc yices
+multiclock on
+
+[script]
+read_verilog -sv rtl/core/rt_interrupt_controller.v
+prep -top rt_interrupt_controller
+chformal -early
+
+[files]
+rtl/core/rt_interrupt_controller.v
+
+[tasks]
+# Property 1: IRQ entry completes in exactly 12 cycles
+check_entry_latency:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (|i_irq_pending && i_irq_enable) |-> ##12 o_irq_valid
+    );
+
+# Property 2: No IRQ valid before 12 cycles
+check_no_early_irq:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (|i_irq_pending && i_irq_enable) |-> !(o_irq_valid throughout [1:11])
+    );
+
+# Property 3: IRQ active after valid
+check_irq_active:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        o_irq_valid |-> o_irq_active
+    );

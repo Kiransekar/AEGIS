@@ -1,0 +1,47 @@
+#===============================================================================
+# AEGIS-RV Power Intent (UPF)
+# Defines power domains, isolation, retention, and power switches
+#===============================================================================
+
+# Create power domains
+create_power_domain PD_RT
+create_power_domain PD_SECURITY
+
+# Create power states
+create_power_state PD_RT -state RUN   {-supply {primary 1.2}}
+create_power_state PD_RT -state SLEEP  {-supply {primary 0.0}}
+create_power_state PD_RT -state SAFE_STATE {-supply {primary 0.0}}
+
+# Create isolation strategy
+# @SAFETY: RT domain outputs must be clamped during SLEEP/SAFE_STATE
+create_isolation_strategy ISO_RT \
+    -domain PD_RT \
+    -isolation_signal o_iso_en \
+    -isolation_value 0 \
+    -clamp_value 0
+
+# Create retention strategy
+# @SAFETY: Critical registers preserved during SLEEP
+create_retention_strategy RET_RT \
+    -domain PD_RT \
+    -retention_signal o_retention_en \
+    -save_signal o_retention_en \
+    -restore_signal i_restore
+
+# Create power switch
+create_power_switch PS_RT \
+    -domain PD_RT \
+    -input_supply {VDD} \
+    -output_supply {VDD_RT} \
+    -control_signal o_pwr_switch_n
+
+# Create power state table
+create_power_state_table PST_RT \
+    -domains {PD_RT} \
+    -states {
+        {RUN RUN}
+        {SLEEP SLEEP}
+        {SAFE_STATE SAFE_STATE}
+    }
+
+echo "✓ Power intent loaded"

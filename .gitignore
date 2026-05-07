@@ -1,0 +1,52 @@
+#===============================================================================
+# AEGIS-RV Git Ignore
+#===============================================================================
+
+# Build artifacts
+sim/
+signoff/
+syn/*.log
+syn/*_syn.v
+syn/*.json
+syn/reports/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Tool-specific
+*.vcd
+*.fst
+*.ghw
+*.log
+*.vpd
+*.key
+*.vdb
+
+# Synthesis outputs
+syn/core/*_syn.v
+syn/memory/*_syn.v
+syn/*.json
+
+# OpenROAD outputs
+openroad/*.def
+openroad/*.gds
+openroad/*.rpt
+
+# Firmware build
+firmware/build/
+firmware/*.o
+firmware/*.elf
+firmware/*.bin
+firmware/*.map
+
+# OS files
+.DS_Store
+*.swp
+*.swo
+*~
+
+# PDK (large, cloned separately)
+skywater-pdk/
+third_party/skywater-pdk/

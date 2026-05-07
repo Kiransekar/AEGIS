@@ -1,0 +1,48 @@
+#===============================================================================
+# SymbiYosys: TCLS Voter Properties
+# Module: tcls_voter
+# Properties: Quarantine latency, voting correctness, threshold behavior
+#===============================================================================
+
+[options]
+mode bmc
+depth 35
+engines smtbmc yices
+multiclock on
+
+[script]
+read_verilog -sv rtl/core/tcls_voter.v
+read_verilog -sv rtl/core/tcls_mismatch_counter.v
+prep -top tcls_voter
+chformal -early
+
+[files]
+rtl/core/tcls_voter.v
+rtl/core/tcls_mismatch_counter.v
+sby/sby_common.svh
+
+[tasks]
+# Property 1: Quarantine within 5 cycles of threshold breach
+check_quarantine:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (o_mismatch_cnt >= 2'd3) |-> ##[1:5] o_quarantine_req
+    );
+
+# Property 2: Majority voting correctness (no quarantine)
+check_voting:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n || o_quarantine_req)
+        ((i_core_a_out == i_core_b_out) || (i_core_a_out == i_core_c_out)) |->
+        o_voter_output == ((i_core_a_out == i_core_b_out) ? i_core_a_out : i_core_c_out)
+    );
+
+# Property 3: Counter resets on match (no false accumulation)
+check_counter_reset:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        !o_mismatch |-> ##1 (o_mismatch_cnt == 2'd0)
+    );
+
+# Property 4: Hot-spare promotion within 10 cycles
+check_spare_promo:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        o_quarantine_req && i_spare_core_en |-> ##[1:10] o_spare_core_active
+    );

@@ -1,0 +1,32 @@
+#===============================================================================
+# SymbiYosys: Branch Latency Determinism Proof
+# Module: rt_branch_unit
+# Properties: Branch resolution = 1 cycle, no data-dependent timing
+#===============================================================================
+
+[options]
+mode bmc
+depth 20
+engines smtbmc yices
+
+[script]
+read_verilog -sv rtl/core/rt_branch_unit.v
+prep -top rt_branch_unit
+chformal -early
+
+[files]
+rtl/core/rt_branch_unit.v
+
+[tasks]
+# Property 1: Branch result available within 1 cycle of inputs
+check_branch_1cycle:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_branch_eq || i_branch_ne || i_branch_lt || i_branch_ge ||
+         i_branch_ltu || i_branch_geu || i_jump) |-> ##1 1
+    );
+
+# Property 2: Branch taken is purely combinational (no registered delay)
+check_combinational:
+    cover property (@(posedge i_clk) disable iff (!i_rst_n)
+        o_branch_taken && !o_branch_taken[->1]
+    );

@@ -1,0 +1,34 @@
+#===============================================================================
+# SymbiYosys: FPU FTZ Determinism Proof
+# Module: rt_fpu
+# Properties: FTZ mode produces zero for subnormal inputs;
+#             No data-dependent output timing
+#===============================================================================
+
+[options]
+mode bmc
+depth 15
+engines smtbmc yices
+
+[script]
+read_verilog -sv rtl/core/rt_fpu.v
+prep -top rt_fpu
+chformal -early
+
+[files]
+rtl/core/rt_fpu.v
+
+[tasks]
+# Property 1: Subnormal input with FTZ enabled produces zero output
+check_ftz_flush:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_valid && i_ftz_enable &&
+         (i_operand_a[30:23] == 8'd0 && i_operand_a[22:0] != 23'd0))
+        |=> (o_result[30:23] == 8'd0 || o_result == 32'h00000000 || o_result == 32'h80000000)
+    );
+
+# Property 2: FPU always produces valid output in exactly 1 cycle
+check_1cycle_latency:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        i_valid |=> o_valid
+    );

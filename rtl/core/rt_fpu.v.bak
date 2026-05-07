@@ -1,0 +1,540 @@
+//===============================================================================
+// Module: rt_fpu
+// Project: AEGIS-RV — Safety-Certifiable RISC-V Processor IP
+// File: rtl/core/rt_fpu.v
+// Version: 2.0
+// Date: 2026-05-04
+//
+// Description:
+//   Single-precision FPU with Flush-To-Zero (FTZ) mode.
+//   All operations complete in 1 cycle (deterministic timing).
+//   Subnormal inputs/outputs are flushed to zero to prevent
+//   latency variance — critical for WCET certification.
+//
+// Safety Annotations:
+//   @CERT: AEGIS-RT-FPU-001 — ARCHITECTURE.md §3 (FPU)
+//   @SAFETY: FTZ mode prevents subnormal latency variance
+//   @WCET: All FPU ops = 1 cycle (FTZ guarantees no multi-cycle paths)
+//   @SIDE_CHANNEL: No data-dependent timing (FTZ eliminates subnormal paths)
+//
+// License: Apache 2.0 (core) / Proprietary (Xdrone extensions)
+//===============================================================================
+
+module rt_fpu #(
+    parameter DATA_WIDTH = 32
+) (
+    input  wire        i_clk,
+    input  wire        i_rst_n,
+
+    // FPU Operation Interface
+    input  wire [3:0]  i_fpu_op,         // FPU operation select
+    input  wire [DATA_WIDTH-1:0] i_operand_a,  // Float operand A (IEEE 754)
+    input  wire [DATA_WIDTH-1:0] i_operand_b,  // Float operand B (IEEE 754)
+    input  wire        i_valid,          // Operation valid
+    output wire [DATA_WIDTH-1:0] o_result,
+    output wire        o_valid,          // Result valid
+    output wire        o_fflags_invalid,  // Invalid operation
+    output wire        o_fflags_divzero,  // Divide by zero
+    output wire        o_fflags_overflow, // Overflow
+    output wire        o_fflags_underflow,// Underflow
+    output wire        o_fflags_inexact,  // Inexact result
+
+    // FTZ Control
+    input  wire        i_ftz_enable,     // Flush-to-zero enable (CSR-controlled)
+
+    // Integer conversion interface
+    output wire [DATA_WIDTH-1:0] o_int_result,  // Integer result (FCVT.W.S / FMV.X.W)
+    input  wire [DATA_WIDTH-1:0] i_int_operand, // Integer input (FCVT.S.W / FMV.W.X)
+    output wire        o_wb_int           // Writeback to integer register
+);
+
+    //-------------------------------------------------------------------------
+    // IEEE 754 Single-Precision Field Extraction
+    //-------------------------------------------------------------------------
+    wire        sign_a  = i_operand_a[31];
+    wire [7:0]  exp_a   = i_operand_a[30:23];
+    wire [22:0] mant_a  = i_operand_a[22:0];
+
+    wire        sign_b  = i_operand_b[31];
+    wire [7:0]  exp_b   = i_operand_b[30:23];
+    wire [22:0] mant_b  = i_operand_b[22:0];
+
+    // Classification
+    wire is_zero_a      = (exp_a == 8'd0) && (mant_a == 23'd0);
+    wire is_subnormal_a = (exp_a == 8'd0) && (mant_a != 23'd0);
+    wire is_inf_a       = (exp_a == 8'd255) && (mant_a == 23'd0);
+    wire is_nan_a       = (exp_a == 8'd255) && (mant_a != 23'd0);
+
+    wire is_zero_b      = (exp_b == 8'd0) && (mant_b == 23'd0);
+    wire is_subnormal_b = (exp_b == 8'd0) && (mant_b != 23'd0);
+    wire is_inf_b       = (exp_b == 8'd255) && (mant_b == 23'd0);
+    wire is_nan_b       = (exp_b == 8'd255) && (mant_b != 23'd0);
+
+    //-------------------------------------------------------------------------
+    // Flush-To-Zero (FTZ) Logic
+    // @SAFETY: Subnormals flushed to signed zero — prevents multi-cycle paths
+    // @WCET: Eliminates data-dependent timing from subnormal handling
+    //-------------------------------------------------------------------------
+    wire [DATA_WIDTH-1:0] ftz_a = (i_ftz_enable && is_subnormal_a) ?
+                                  {sign_a, 31'd0} : i_operand_a;
+    wire [DATA_WIDTH-1:0] ftz_b = (i_ftz_enable && is_subnormal_b) ?
+                                  {sign_b, 31'd0} : i_operand_b;
+
+    // Re-extract after FTZ
+    wire        ftz_sign_a = ftz_a[31];
+    wire [7:0]  ftz_exp_a  = ftz_a[30:23];
+    wire [22:0] ftz_mant_a = ftz_a[22:0];
+    wire        ftz_sign_b = ftz_b[31];
+    wire [7:0]  ftz_exp_b  = ftz_b[30:23];
+    wire [22:0] ftz_mant_b = ftz_b[22:0];
+
+    // Implicit leading 1 (normal) or 0 (zero after FTZ)
+    wire [23:0] full_mant_a = {(!is_subnormal_a || !i_ftz_enable) && (ftz_exp_a != 8'd0), ftz_mant_a};
+    wire [23:0] full_mant_b = {(!is_subnormal_b || !i_ftz_enable) && (ftz_exp_b != 8'd0), ftz_mant_b};
+
+    //-------------------------------------------------------------------------
+    // Leading-zero count for normalization (combinational function)
+    //-------------------------------------------------------------------------
+    function [4:0] count_leading_zeros;
+        input [24:0] val;
+        begin
+            if      (val[23]) count_leading_zeros = 5'd0;
+            else if (val[22]) count_leading_zeros = 5'd1;
+            else if (val[21]) count_leading_zeros = 5'd2;
+            else if (val[20]) count_leading_zeros = 5'd3;
+            else if (val[19]) count_leading_zeros = 5'd4;
+            else if (val[18]) count_leading_zeros = 5'd5;
+            else if (val[17]) count_leading_zeros = 5'd6;
+            else if (val[16]) count_leading_zeros = 5'd7;
+            else if (val[15]) count_leading_zeros = 5'd8;
+            else if (val[14]) count_leading_zeros = 5'd9;
+            else if (val[13]) count_leading_zeros = 5'd10;
+            else if (val[12]) count_leading_zeros = 5'd11;
+            else if (val[11]) count_leading_zeros = 5'd12;
+            else if (val[10]) count_leading_zeros = 5'd13;
+            else if (val[9])  count_leading_zeros = 5'd14;
+            else if (val[8])  count_leading_zeros = 5'd15;
+            else if (val[7])  count_leading_zeros = 5'd16;
+            else if (val[6])  count_leading_zeros = 5'd17;
+            else if (val[5])  count_leading_zeros = 5'd18;
+            else if (val[4])  count_leading_zeros = 5'd19;
+            else if (val[3])  count_leading_zeros = 5'd20;
+            else if (val[2])  count_leading_zeros = 5'd21;
+            else if (val[1])  count_leading_zeros = 5'd22;
+            else if (val[0])  count_leading_zeros = 5'd23;
+            else              count_leading_zeros = 5'd24;
+        end
+    endfunction
+
+    //-------------------------------------------------------------------------
+    // FADD/FSUB combinational computation (continuous wire, iverilog-safe)
+    //-------------------------------------------------------------------------
+    // Alignment
+    wire        add_a_larger = (ftz_exp_a >= ftz_exp_b);
+    wire [7:0]  add_big_exp  = add_a_larger ? ftz_exp_a : ftz_exp_b;
+    wire [7:0]  add_exp_diff = add_a_larger ? (ftz_exp_a - ftz_exp_b) : (ftz_exp_b - ftz_exp_a);
+    wire [23:0] add_al_a     = add_a_larger ? full_mant_a : (add_exp_diff < 8'd24 ? (full_mant_a >> add_exp_diff[4:0]) : 24'd0);
+    wire [23:0] add_al_b     = add_a_larger ? (add_exp_diff < 8'd24 ? (full_mant_b >> add_exp_diff[4:0]) : 24'd0) : full_mant_b;
+
+    // Effective sign of b (negated for FSUB)
+    wire add_eff_sign_b = ftz_sign_b;  // FADD; overridden in case statement for FSUB
+
+    // Same-sign addition vs different-sign subtraction
+    wire add_same_sign  = (ftz_sign_a == ftz_sign_b);
+    wire [24:0] add_sum = {1'b0, add_al_a} + {1'b0, add_al_b};
+    wire [24:0] add_dif = (ftz_exp_a > ftz_exp_b || (ftz_exp_a == ftz_exp_b && full_mant_a >= full_mant_b))
+                          ? ({1'b0, add_al_a} - {1'b0, add_al_b})
+                          : ({1'b0, add_al_b} - {1'b0, add_al_a});
+    wire add_a_wins = (ftz_exp_a > ftz_exp_b || (ftz_exp_a == ftz_exp_b && full_mant_a >= full_mant_b));
+
+    // FADD result (same sign = add, diff sign = subtract)
+    wire [24:0] fadd_raw_mant = add_same_sign ? add_sum : add_dif;
+    wire        fadd_raw_sign = add_same_sign ? ftz_sign_a : (add_a_wins ? ftz_sign_a : ftz_sign_b);
+
+    // FSUB result (negate b sign: same original sign = subtract, diff = add)
+    wire        fsub_same_eff = (ftz_sign_a != ftz_sign_b);  // a and -b same sign
+    wire [24:0] fsub_raw_mant = fsub_same_eff ? add_sum : add_dif;
+    wire        fsub_raw_sign = fsub_same_eff ? ftz_sign_a : (add_a_wins ? ftz_sign_a : ~ftz_sign_a);
+
+    // Normalization for FADD
+    wire        fadd_has_carry = fadd_raw_mant[24];
+    wire [24:0] fadd_norm1_mant = fadd_has_carry ? (fadd_raw_mant >> 1) : fadd_raw_mant;
+    wire [7:0]  fadd_norm1_exp  = fadd_has_carry ? (add_big_exp + 8'd1) : add_big_exp;
+    wire [4:0]  fadd_lz = count_leading_zeros(fadd_norm1_mant);
+    wire        fadd_need_lz = (fadd_norm1_mant[23] == 1'b0) && (fadd_norm1_mant != 25'd0);
+    wire [24:0] fadd_norm_mant = fadd_need_lz ? (fadd_norm1_mant << fadd_lz) : fadd_norm1_mant;
+    wire [7:0]  fadd_norm_exp  = fadd_need_lz ? (fadd_norm1_exp - {3'd0, fadd_lz}) : fadd_norm1_exp;
+    wire        fadd_is_zero   = (fadd_norm_exp == 8'd0) || (fadd_norm_mant == 25'd0);
+    wire [31:0] fadd_result   = fadd_is_zero ? {fadd_raw_sign, 31'd0}
+                                              : {fadd_raw_sign, fadd_norm_exp, fadd_norm_mant[22:0]};
+
+    // Normalization for FSUB
+    wire        fsub_has_carry = fsub_raw_mant[24];
+    wire [24:0] fsub_norm1_mant = fsub_has_carry ? (fsub_raw_mant >> 1) : fsub_raw_mant;
+    wire [7:0]  fsub_norm1_exp  = fsub_has_carry ? (add_big_exp + 8'd1) : add_big_exp;
+    wire [4:0]  fsub_lz = count_leading_zeros(fsub_norm1_mant);
+    wire        fsub_need_lz = (fsub_norm1_mant[23] == 1'b0) && (fsub_norm1_mant != 25'd0);
+    wire [24:0] fsub_norm_mant = fsub_need_lz ? (fsub_norm1_mant << fsub_lz) : fsub_norm1_mant;
+    wire [7:0]  fsub_norm_exp  = fsub_need_lz ? (fsub_norm1_exp - {3'd0, fsub_lz}) : fsub_norm1_exp;
+    wire        fsub_is_zero   = (fsub_norm_exp == 8'd0) || (fsub_norm_mant == 25'd0);
+    wire [31:0] fsub_result   = fsub_is_zero ? {fsub_raw_sign, 31'd0}
+                                              : {fsub_raw_sign, fsub_norm_exp, fsub_norm_mant[22:0]};
+
+    //-------------------------------------------------------------------------
+    // FPU Operation Encoding
+    //-------------------------------------------------------------------------
+    localparam [3:0] FPU_FLW    = 4'd0;   // Float load (pass-through)
+    localparam [3:0] FPU_FSW    = 4'd1;   // Float store (pass-through)
+    localparam [3:0] FPU_FADD   = 4'd2;   // Float add
+    localparam [3:0] FPU_FSUB   = 4'd3;   // Float subtract
+    localparam [3:0] FPU_FMUL   = 4'd4;   // Float multiply
+    localparam [3:0] FPU_FDIV   = 4'd5;   // Float divide
+    localparam [3:0] FPU_FSQRT  = 4'd6;   // Float square root
+    localparam [3:0] FPU_FMIN   = 4'd7;   // Float minimum
+    localparam [3:0] FPU_FMAX   = 4'd8;   // Float maximum
+    localparam [3:0] FPU_FSGNJ  = 4'd9;   // Sign injection
+    localparam [3:0] FPU_FSGNJN = 4'd10;  // Sign injection negate
+    localparam [3:0] FPU_FSGNJX = 4'd11;  // Sign injection XOR
+    localparam [3:0] FPU_CVTWS  = 4'd12;  // Float → Int
+    localparam [3:0] FPU_CVTSW  = 4'd13;  // Int → Float
+    localparam [3:0] FPU_MVXW   = 4'd14;  // Move float → int (bitwise)
+    localparam [3:0] FPU_MVWX   = 4'd15;  // Move int → float (bitwise)
+
+    //-------------------------------------------------------------------------
+    // FPU Result Computation
+    // @WCET: All operations combinational — 1 cycle
+    // @SAFETY: NaN boxing for result; FTZ for subnormal outputs
+    //-------------------------------------------------------------------------
+    reg [DATA_WIDTH-1:0] fpu_result;
+    reg [DATA_WIDTH-1:0] int_result_reg;
+    reg                  wb_int_reg;
+    reg                  flag_invalid;
+    reg                  flag_divzero;
+    reg                  flag_overflow;
+    reg                  flag_underflow;
+    reg                  flag_inexact;
+
+    // Canonical quiet NaN
+    wire [DATA_WIDTH-1:0] CANONICAL_NAN = 32'h7FC0_0000;
+
+    always @* begin
+        fpu_result     = 32'd0;
+        int_result_reg = 32'd0;
+        wb_int_reg     = 1'b0;
+        flag_invalid   = 1'b0;
+        flag_divzero   = 1'b0;
+        flag_overflow  = 1'b0;
+        flag_underflow = 1'b0;
+        flag_inexact   = 1'b0;
+
+        case (i_fpu_op)
+            //---------------------------------------------------------
+            // FLW / FSW — pass-through (handled by memory unit)
+            //---------------------------------------------------------
+            FPU_FLW: fpu_result = i_operand_a;
+            FPU_FSW: fpu_result = i_operand_a;
+
+            //---------------------------------------------------------
+            // FADD.S — IEEE 754 single-precision add with alignment
+            // @SAFETY: Proper exponent alignment + FTZ output flush
+            //---------------------------------------------------------
+            FPU_FADD: begin
+                if (is_nan_a || is_nan_b) begin
+                    fpu_result   = CANONICAL_NAN;
+                    flag_invalid = 1'b1;
+                end else if (is_inf_a && is_inf_b && (ftz_sign_a != ftz_sign_b)) begin
+                    fpu_result   = CANONICAL_NAN;
+                    flag_invalid = 1'b1;
+                end else if (is_inf_a) begin
+                    fpu_result = ftz_a;
+                end else if (is_inf_b) begin
+                    fpu_result = ftz_b;
+                end else begin
+                    fpu_result = fadd_result;
+                end
+            end
+
+            //---------------------------------------------------------
+            // FSUB.S — a - b = a + (-b)
+            //---------------------------------------------------------
+            FPU_FSUB: begin
+                if (is_nan_a || is_nan_b) begin
+                    fpu_result   = CANONICAL_NAN;
+                    flag_invalid = 1'b1;
+                end else if (is_inf_a && is_inf_b && (ftz_sign_a == ftz_sign_b)) begin
+                    fpu_result   = CANONICAL_NAN;
+                    flag_invalid = 1'b1;
+                end else if (is_inf_a) begin
+                    fpu_result = ftz_a;
+                end else if (is_inf_b) begin
+                    fpu_result = {~ftz_sign_b, ftz_exp_b, ftz_mant_b};
+                end else begin
+                    fpu_result = fsub_result;
+                end
+            end
+
+            //---------------------------------------------------------
+            // FMUL.S
+            // @WCET: 1 cycle (FTZ eliminates subnormal multiply paths)
+            //---------------------------------------------------------
+            FPU_FMUL: begin
+                if (is_nan_a || is_nan_b) begin
+                    fpu_result   = CANONICAL_NAN;
+                    flag_invalid = 1'b1;
+                end else if ((is_inf_a && is_zero_b) || (is_zero_a && is_inf_b)) begin
+                    fpu_result   = CANONICAL_NAN;
+                    flag_invalid = 1'b1;
+                end else if (is_inf_a || is_inf_b) begin
+                    fpu_result = {(ftz_sign_a ^ ftz_sign_b), 8'hFF, 23'd0};
+                end else if (is_zero_a || is_zero_b) begin
+                    fpu_result = {(ftz_sign_a ^ ftz_sign_b), 31'd0};
+                end else begin
+                    begin : fmul_impl
+                        reg [7:0]  result_exp;
+                        reg [47:0] product;
+                        reg        result_sign;
+
+                        result_sign = ftz_sign_a ^ ftz_sign_b;
+                        result_exp  = ftz_exp_a + ftz_exp_b - 8'd127;
+                        product     = full_mant_a * full_mant_b;
+
+                        // Normalize: product[47] is the integer carry bit
+                        if (product[47]) begin
+                            result_exp = result_exp + 8'd1;
+                        end
+
+                        // @SAFETY: Overflow → Inf; Underflow → FTZ
+                        if (result_exp >= 8'd255) begin
+                            fpu_result    = {result_sign, 8'hFF, 23'd0};
+                            flag_overflow = 1'b1;
+                        end else if (result_exp == 8'd0 || result_exp == 8'd1) begin
+                            fpu_result     = {result_sign, 31'd0};
+                            flag_underflow = i_ftz_enable;
+                        end else begin
+                            // Extract mantissa: bits [46:24] when product[47]=1
+                            // or bits [45:23] when product[47]=0
+                            fpu_result = {result_sign, result_exp,
+                                          product[47] ? product[46:24] : product[45:23]};
+                        end
+                    end
+                end
+            end
+
+            //---------------------------------------------------------
+            // FDIV.S — Phase 2: iterative; Phase 1: stub
+            //---------------------------------------------------------
+            FPU_FDIV: begin
+                if (is_nan_a || is_nan_b) begin
+                    fpu_result   = CANONICAL_NAN;
+                    flag_invalid = 1'b1;
+                end else if (is_zero_b && !is_zero_a) begin
+                    fpu_result   = {(ftz_sign_a ^ ftz_sign_b), 8'hFF, 23'd0};
+                    flag_divzero = 1'b1;
+                end else if (is_zero_a && is_zero_b) begin
+                    fpu_result   = CANONICAL_NAN;
+                    flag_invalid = 1'b1;
+                end else if (is_inf_a) begin
+                    if (is_inf_b) begin
+                        fpu_result   = CANONICAL_NAN;
+                        flag_invalid = 1'b1;
+                    end else begin
+                        fpu_result = {(ftz_sign_a ^ ftz_sign_b), 8'hFF, 23'd0};
+                    end
+                end else if (is_inf_b) begin
+                    fpu_result = {(ftz_sign_a ^ ftz_sign_b), 31'd0};
+                end else begin
+                    // Phase 1 stub: return approximate result
+                    fpu_result = {(ftz_sign_a ^ ftz_sign_b), 8'd127, 23'd0};
+                end
+            end
+
+            //---------------------------------------------------------
+            // FSQRT.S — Phase 2: iterative; Phase 1: stub
+            //---------------------------------------------------------
+            FPU_FSQRT: begin
+                if (is_nan_a || ftz_sign_a) begin
+                    fpu_result   = CANONICAL_NAN;
+                    flag_invalid = 1'b1;
+                end else if (is_zero_a) begin
+                    fpu_result = 32'd0;
+                end else if (is_inf_a) begin
+                    fpu_result = ftz_a;
+                end else begin
+                    // Phase 1 stub
+                    fpu_result = {1'b0, ftz_exp_a, ftz_mant_a};
+                end
+            end
+
+            //---------------------------------------------------------
+            // FMIN.S / FMAX.S
+            //---------------------------------------------------------
+            FPU_FMIN: begin
+                if (is_nan_a || is_nan_b) begin
+                    fpu_result   = CANONICAL_NAN;
+                    flag_invalid = 1'b1;
+                end else begin
+                    // IEEE 754 float comparison
+                    // Negative numbers < positive; compare magnitude within sign
+                    begin : fmin_cmp
+                        reg a_lt_b;
+                        if (ftz_sign_a != ftz_sign_b) begin
+                            // Different signs: negative is smaller
+                            a_lt_b = ftz_sign_a;
+                        end else if (ftz_sign_a) begin
+                            // Both negative: larger magnitude is smaller
+                            a_lt_b = (ftz_exp_a > ftz_exp_b) ||
+                                      (ftz_exp_a == ftz_exp_b && full_mant_a > full_mant_b);
+                        end else begin
+                            // Both positive: smaller magnitude is smaller
+                            a_lt_b = (ftz_exp_a < ftz_exp_b) ||
+                                      (ftz_exp_a == ftz_exp_b && full_mant_a < full_mant_b);
+                        end
+                        fpu_result = a_lt_b ? ftz_a : ftz_b;
+                    end
+                end
+            end
+
+            FPU_FMAX: begin
+                if (is_nan_a || is_nan_b) begin
+                    fpu_result   = CANONICAL_NAN;
+                    flag_invalid = 1'b1;
+                end else begin
+                    begin : fmax_cmp
+                        reg a_gt_b;
+                        if (ftz_sign_a != ftz_sign_b) begin
+                            a_gt_b = ftz_sign_b;  // positive is larger
+                        end else if (ftz_sign_a) begin
+                            // Both negative: smaller magnitude is larger
+                            a_gt_b = (ftz_exp_a < ftz_exp_b) ||
+                                      (ftz_exp_a == ftz_exp_b && full_mant_a < full_mant_b);
+                        end else begin
+                            // Both positive: larger magnitude is larger
+                            a_gt_b = (ftz_exp_a > ftz_exp_b) ||
+                                      (ftz_exp_a == ftz_exp_b && full_mant_a > full_mant_b);
+                        end
+                        fpu_result = a_gt_b ? ftz_a : ftz_b;
+                    end
+                end
+            end
+
+            //---------------------------------------------------------
+            // Sign injection: FSGNJ / FSGNJN / FSGNJX
+            //---------------------------------------------------------
+            FPU_FSGNJ: begin
+                fpu_result = {i_operand_b[31], i_operand_a[30:0]};
+            end
+
+            FPU_FSGNJN: begin
+                fpu_result = {~i_operand_b[31], i_operand_a[30:0]};
+            end
+
+            FPU_FSGNJX: begin
+                fpu_result = {i_operand_a[31] ^ i_operand_b[31], i_operand_a[30:0]};
+            end
+
+            //---------------------------------------------------------
+            // FCVT.W.S — Float to Int
+            // @SAFETY: Round-toward-zero; NaN/Inf → max int
+            //---------------------------------------------------------
+            FPU_CVTWS: begin
+                wb_int_reg = 1'b1;
+                if (is_nan_a || is_inf_a) begin
+                    int_result_reg = 32'h7FFF_FFFF;
+                    flag_invalid   = 1'b1;
+                end else if (is_zero_a || is_subnormal_a) begin
+                    int_result_reg = 32'd0;
+                end else begin
+                    // Simplified: extract integer part
+                    begin : cvt_impl
+                        reg [7:0] shift_amt;
+                        reg [22:0] int_mant;
+                        shift_amt = 8'd150 - ftz_exp_a;  // 127 + 23
+                        if (ftz_exp_a < 8'd150) begin
+                            // Has fractional part — truncate
+                            int_mant = ftz_mant_a >> shift_amt[4:0];
+                            int_result_reg = ftz_sign_a ? -{9'd0, int_mant} : {9'd0, int_mant};
+                            flag_inexact = 1'b1;
+                        end else begin
+                            // Pure integer
+                            int_result_reg = ftz_sign_a ? -ftz_a : ftz_a;
+                        end
+                    end
+                end
+            end
+
+            //---------------------------------------------------------
+            // FCVT.S.W — Int to Float
+            //---------------------------------------------------------
+            FPU_CVTSW: begin
+                // Convert integer to float (simplified)
+                fpu_result = i_int_operand;  // Phase 1: bitwise
+            end
+
+            //---------------------------------------------------------
+            // FMV.X.W / FMV.W.X — bitwise move
+            //---------------------------------------------------------
+            FPU_MVXW: begin
+                wb_int_reg     = 1'b1;
+                int_result_reg = i_operand_a;
+            end
+
+            FPU_MVWX: begin
+                fpu_result = i_int_operand;
+            end
+
+            //---------------------------------------------------------
+            // @SAFETY: Default prevents latch; illegal FPU op → NaN
+            //---------------------------------------------------------
+            default: begin
+                fpu_result   = CANONICAL_NAN;
+                flag_invalid = 1'b1;
+            end
+        endcase
+    end
+
+    //-------------------------------------------------------------------------
+    // Output registration (1-cycle latency)
+    // @WCET: 1 cycle for all FPU operations
+    //-------------------------------------------------------------------------
+    reg [DATA_WIDTH-1:0] result_q;
+    reg [DATA_WIDTH-1:0] int_result_q;
+    reg                  valid_q;
+    reg                  wb_int_q;
+    reg                  f_inv_q, f_dz_q, f_ov_q, f_uf_q, f_ix_q;
+
+    always @(posedge i_clk or negedge i_rst_n) begin
+        if (!i_rst_n) begin
+            result_q     <= 32'd0;
+            int_result_q <= 32'd0;
+            valid_q      <= 1'b0;
+            wb_int_q     <= 1'b0;
+            f_inv_q      <= 1'b0;
+            f_dz_q       <= 1'b0;
+            f_ov_q       <= 1'b0;
+            f_uf_q       <= 1'b0;
+            f_ix_q       <= 1'b0;
+        end else if (i_valid) begin
+            result_q     <= fpu_result;
+            int_result_q <= int_result_reg;
+            valid_q      <= 1'b1;
+            wb_int_q     <= wb_int_reg;
+            f_inv_q      <= flag_invalid;
+            f_dz_q       <= flag_divzero;
+            f_ov_q       <= flag_overflow;
+            f_uf_q       <= flag_underflow;
+            f_ix_q       <= flag_inexact;
+        end
+        // Hold valid/flags until next i_valid — processor pipeline friendly
+    end
+
+    assign o_result          = result_q;
+    assign o_int_result      = int_result_q;
+    assign o_valid           = valid_q;
+    assign o_wb_int          = wb_int_q;
+    assign o_fflags_invalid  = f_inv_q;
+    assign o_fflags_divzero  = f_dz_q;
+    assign o_fflags_overflow = f_ov_q;
+    assign o_fflags_underflow = f_uf_q;
+    assign o_fflags_inexact  = f_ix_q;
+
+endmodule

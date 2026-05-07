@@ -1,0 +1,32 @@
+#===============================================================================
+# SymbiYosys: TT Arbiter Latency Bound Proof
+# Module: tt_arbiter_4master
+# Properties: RT master always granted within ≤120 ns (29 cycles @ 240 MHz)
+#             No starvation for RT master
+#===============================================================================
+
+[options]
+mode bmc
+depth 30
+engines smtbmc yices
+
+[script]
+read_verilog -sv rtl/interconnect/tt_arbiter_4master.v
+prep -top tt_arbiter_4master
+chformal -early
+
+[files]
+rtl/interconnect/tt_arbiter_4master.v
+
+[tasks]
+# Property 1: RT master (port 0) granted within 29 cycles of request
+check_rt_latency_bound:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_req[0] && !o_grant[0]) |-> o_grant[0] within [1:29]
+    );
+
+# Property 2: No starvation — RT master eventually granted
+check_no_starvation:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        i_req[0] |-> eventually o_grant[0]
+    );

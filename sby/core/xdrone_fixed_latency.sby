@@ -1,0 +1,37 @@
+#===============================================================================
+# SymbiYosys: Xdrone Fixed-Latency Properties
+# Module: xdrone_dispatcher
+# Properties: qmul=2 cycles, kalman=4 cycles, constant-time
+#===============================================================================
+
+[options]
+mode bmc
+depth 20
+engines smtbmc yices
+
+[script]
+read_verilog -sv rtl/core/xdrone_dispatcher.v
+prep -top xdrone_dispatcher
+chformal -early
+
+[files]
+rtl/core/xdrone_dispatcher.v
+
+[tasks]
+# qmul: Exactly 2 cycles
+check_qmul_latency:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_req_valid && i_req_opcode == 7'h01) |-> ##2 o_done
+    );
+
+# kalman: Exactly 4 cycles
+check_kalman_latency:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_req_valid && i_req_opcode == 7'h02) |-> ##4 o_done
+    );
+
+# No data-dependent timing (constant-time invariant)
+check_constant_time:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        i_req_valid |-> !o_done
+    );

@@ -1,0 +1,37 @@
+#===============================================================================
+# SymbiYosys: Constant-Time Invariant Proof
+# Module: constant_time_wrapper
+# Properties: No data-dependent timing, fixed 64-cycle execution
+#===============================================================================
+
+[options]
+mode bmc
+depth 80
+engines smtbmc yices
+
+[script]
+read_verilog -sv rtl/security/constant_time_wrapper.v
+prep -top constant_time_wrapper
+chformal -early
+
+[files]
+rtl/security/constant_time_wrapper.v
+
+[tasks]
+# Property 1: Execution always completes in exactly 64 cycles
+check_fixed_latency:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_start) |-> ##64 o_done
+    );
+
+# Property 2: No early completion (no data-dependent early exit)
+check_no_early_done:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_start) |-> !(o_done throughout [1:63])
+    );
+
+# Property 3: Busy flag during execution
+check_busy_during_exec:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_start) |-> o_busy throughout [1:64]
+    );

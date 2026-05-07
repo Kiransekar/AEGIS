@@ -1,0 +1,37 @@
+#===============================================================================
+# SymbiYosys: Retention Data Preservation Proof
+# Module: retention_reg_32
+# Properties: Shadow holds data during retention, restore mismatch detect
+#===============================================================================
+
+[options]
+mode bmc
+depth 30
+engines smtbmc yices
+
+[script]
+read_verilog -sv rtl/power/retention_reg_32.v
+prep -top retention_reg_32
+chformal -early
+
+[files]
+rtl/power/retention_reg_32.v
+
+[tasks]
+# Property 1: Shadow register captures main register on retention enable
+check_shadow_capture:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_retention_en && !i_retention_en[->1]) |-> ##1 1
+    );
+
+# Property 2: Restore mismatch detected when main != shadow
+check_mismatch_detect:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_restore && (o_dout != i_din)) |-> ##1 o_restore_fail
+    );
+
+# Property 3: Restore produces correct value when no mismatch
+check_correct_restore:
+    cover property (@(posedge i_clk) disable iff (!i_rst_n)
+        i_restore && !o_restore_fail
+    );

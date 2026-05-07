@@ -1,0 +1,38 @@
+#===============================================================================
+# SymbiYosys: Watchdog Timeout Latching Proof
+# Module: rt_watchdog
+# Properties: Timeout flag latches and stays until reset;
+#             Kick resets counter; Enable gates operation
+#===============================================================================
+
+[options]
+mode bmc
+depth 20
+engines smtbmc yices
+
+[script]
+read_verilog -sv rtl/core/rt_watchdog.v
+prep -top rt_watchdog
+chformal -early
+
+[files]
+rtl/core/rt_watchdog.v
+
+[tasks]
+# Property 1: Timeout flag latches (stays set until reset)
+check_timeout_latch:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (o_timeout == 1'b1) |=> (o_timeout == 1'b1)
+    );
+
+# Property 2: Kick resets counter when enabled
+check_kick_resets:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_enable && i_kick) |=> (counter == 0)
+    );
+
+# Property 3: No timeout when disabled
+check_no_timeout_disabled:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (!i_enable) |=> (!o_timeout)
+    );

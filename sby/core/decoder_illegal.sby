@@ -1,0 +1,35 @@
+#===============================================================================
+# SymbiYosys: Decoder Illegal Instruction Trap Proof
+# Module: rt_decoder
+# Properties: Unrecognized opcodes always set illegal_insn;
+#             Valid RV32IMACF instructions never set illegal_insn
+#===============================================================================
+
+[options]
+mode bmc
+depth 10
+engines smtbmc yices
+
+[script]
+read_verilog -sv rtl/core/rt_decoder.v
+prep -top rt_decoder
+chformal -early
+
+[files]
+rtl/core/rt_decoder.v
+
+[tasks]
+# Property 1: SYSTEM opcode 3'h0 with unknown funct12 = illegal
+check_system_illegal:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_valid && i_instr[6:0] == 7'h73 && i_instr[14:12] == 3'h0 &&
+         !(i_instr[31:20] inside {12'h000, 12'h001, 12'h302}))
+        |-> o_illegal_insn
+    );
+
+# Property 2: Valid LUI instruction never illegal
+check_lui_valid:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_valid && i_instr[6:0] == 7'h37)
+        |-> !o_illegal_insn
+    );

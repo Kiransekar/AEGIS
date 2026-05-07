@@ -1,0 +1,40 @@
+#===============================================================================
+# SymbiYosys: Atomic Reservation Proof
+# Module: rt_atomic
+# Properties: LR sets reservation; SC succeeds only if reservation valid;
+#            External write invalidates reservation
+#===============================================================================
+
+[options]
+mode bmc
+depth 15
+engines smtbmc yices
+
+[script]
+read_verilog -sv rtl/core/rt_atomic.v
+prep -top rt_atomic
+chformal -early
+
+[files]
+rtl/core/rt_atomic.v
+
+[tasks]
+# Property 1: LR.W sets reservation valid
+check_lr_sets_reservation:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        i_lr_req |=> reservation_valid
+    );
+
+# Property 2: SC.W fails when no reservation
+check_sc_fails_no_reservation:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (!reservation_valid && i_sc_req) |=> (o_sc_success == 1'b1)
+    );
+
+# Property 3: External write to reserved address clears reservation
+check_ext_write_clears:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (reservation_valid && i_ext_write &&
+         i_ext_write_addr[ADDR_WIDTH-1:2] == reservation_addr[ADDR_WIDTH-1:2])
+        |=> !reservation_valid
+    );

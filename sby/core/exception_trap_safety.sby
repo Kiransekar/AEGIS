@@ -1,0 +1,44 @@
+#===============================================================================
+# SymbiYosys: Exception Trap Safety Proof
+# Module: rt_exception_handler
+# Properties: ECALL/EBREAK/Illegal always set trap_valid;
+#             MRET sets mret_valid (not trap_valid)
+#===============================================================================
+
+[options]
+mode bmc
+depth 10
+engines smtbmc yices
+
+[script]
+read_verilog -sv rtl/core/rt_exception_handler.v
+prep -top rt_exception_handler
+chformal -early
+
+[files]
+rtl/core/rt_exception_handler.v
+
+[tasks]
+# Property 1: ECALL always triggers trap
+check_ecall_trap:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        i_ecall |-> o_trap_valid
+    );
+
+# Property 2: EBREAK always triggers trap
+check_ebreak_trap:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        i_ebreak |-> o_trap_valid
+    );
+
+# Property 3: Illegal instruction always triggers trap
+check_illegal_trap:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        i_illegal |-> o_trap_valid
+    );
+
+# Property 4: MRET does NOT trigger trap (it's a return)
+check_mret_no_trap:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_mret && !i_ecall && !i_ebreak && !i_illegal) |-> !o_trap_valid
+    );

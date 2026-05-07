@@ -1,0 +1,43 @@
+#===============================================================================
+# SymbiYosys: Forwarding Correctness Proof
+# Module: rt_pipeline_controller
+# Properties: When EX hazard detected, forward select is non-zero;
+#             When no hazard, forward select is zero
+#===============================================================================
+
+[options]
+mode bmc
+depth 10
+engines smtbmc yices
+
+[script]
+read_verilog -sv rtl/core/rt_pipeline_controller.v
+prep -top rt_pipeline_controller
+chformal -early
+
+[files]
+rtl/core/rt_pipeline_controller.v
+
+[tasks]
+# Property 1: EX hazard on rs1 → forward select non-zero
+check_fwd_on_ex_hazard_rs1:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (id_rs1_addr != 0 && id_rs1_addr == ex_rd_addr && ex_reg_we)
+        |-> (o_fwd_rs1_sel != 0)
+    );
+
+# Property 2: No hazard on rs1 → forward select is zero
+check_no_fwd_no_hazard_rs1:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (!(id_rs1_addr != 0 && id_rs1_addr == ex_rd_addr && ex_reg_we) &&
+         !(id_rs1_addr != 0 && id_rs1_addr == wb_rd_addr && wb_reg_we))
+        |-> (o_fwd_rs1_sel == 0)
+    );
+
+# Property 3: Load-use hazard always stalls
+check_load_use_stalls:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        ((id_rs1_addr != 0 && id_rs1_addr == ex_rd_addr && ex_reg_we && ex_mem_re) ||
+         (id_rs2_addr != 0 && id_rs2_addr == ex_rd_addr && ex_reg_we && ex_mem_re))
+        |-> o_stall_decode
+    );

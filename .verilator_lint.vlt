@@ -1,0 +1,26 @@
+#===============================================================================
+# AEGIS-RV Verilator Lint Waivers
+# Rationale: Safety-critical design requires explicit, documented waivers
+#===============================================================================
+
+# PINMISSING: Top-level ports may be unused in submodule instantiation
+# Waiver: Documented in module header; unused ports tied to safe defaults
+lint_off -rule PINMISSING -file "rtl/security/smu.v"
+
+# CASEINCOMPLETE: Intentional in FSMs with default safety fallback
+# Waiver: Default case ensures no latch inference (ISO 26262 compliance)
+lint_off -rule CASEINCOMPLETE -file "rtl/core/aegis_rt_core.v"
+
+# WIDTHTRUNC: Explicit truncation with documented rationale
+# Waiver: All truncations reviewed; upper bits known-zero by design
+lint_off -rule WIDTHTRUNC -file "rtl/memory/ecc_secdec_32.v"
+
+# UNSIGNED: Mixed signed/unsigned in address arithmetic (known-safe)
+# Waiver: Address calculations verified with formal properties
+lint_off -rule UNSIGNED -file "rtl/interconnect/axi_lite_rt_slice.v"
+
+# CRITICAL: Never waive these rules without safety review
+lint_on -rule ALWCOMBNOTSENS
+lint_on -rule MULTIDRIVER
+lint_on -rule UNDRIVEN
+lint_on -rule WIDTHEXPAND

@@ -1,0 +1,13 @@
+#===============================================================================
+# AEGIS-RV SymbiYosys Global Configuration
+#===============================================================================
+
+[options]
+# Default depth for all formal tasks
+depth 30
+
+# Default engines: Yices for efficient bit-vector solving
+engines smtbmc yices
+
+# Multiclock support for async reset handling
+multiclock on

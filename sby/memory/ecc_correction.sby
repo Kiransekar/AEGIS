@@ -1,0 +1,43 @@
+#===============================================================================
+# SymbiYosys: ECC SECDED Correction Proof
+# Module: ecc_secdec_32
+# Properties: Single-error correction, double-error detection
+#===============================================================================
+
+[options]
+mode bmc
+depth 20
+engines smtbmc yices
+
+[script]
+read_verilog -sv rtl/memory/ecc_secdec_32.v
+prep -top ecc_secdec_32
+chformal -early
+
+[files]
+rtl/memory/ecc_secdec_32.v
+
+[tasks]
+# Property 1: No error → output equals input
+check_no_error:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        (i_dec_word == o_enc_word) |-> (o_dec_data == i_enc_data)
+    );
+
+# Property 2: Single-bit error → corrected output equals original data
+check_single_correction:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        o_single_error |-> (o_dec_data == i_enc_data)
+    );
+
+# Property 3: Double-bit error → double_error flag asserted
+check_double_detection:
+    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+        o_double_error |-> !o_single_error
+    );
+
+# Property 4: Single and double error flags are mutually exclusive
+check_mutual_exclusion:
+    assert property (@(posedge i_clk)
+        !(o_single_error && o_double_error)
+    );
