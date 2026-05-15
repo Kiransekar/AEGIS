@@ -1,0 +1,14 @@
+[options]
+mode bmc
+depth 100
+
+[engines]
+smtbmc z3
+
+[script]
+read_verilog -sv ../../rtl/core/rt_exception_handler.v
+prep -top rt_exception_handler
+
+[files]
+../../rtl/core/rt_exception_handler.v
+

@@ -1,0 +1,32 @@
+#===============================================================================
+# AEGIS-RV Power Intent (UPF)
+# Domains: RT_CORE, MEMORY, SECURITY
+#===============================================================================
+
+create_power_domain RT_CORE
+create_power_domain MEMORY
+create_power_domain SECURITY
+
+create_power_net VDD_RT   -domain RT_CORE
+create_power_net VSS      -domain RT_CORE
+create_power_net VDD_MEM  -domain MEMORY
+create_power_net VDD_SEC  -domain SECURITY
+
+#--- Retention Strategy ---
+set_retention rt_retention -domain RT_CORE \
+    -retention_power_net VDD_RT \
+    -retention_ground_net VSS
+
+#--- Isolation Strategy ---
+set_isolation rt_isolation -domain RT_CORE \
+    -isolation_power_net VDD_RT \
+    -isolation_ground_net VSS \
+    -clamp_value 0
+
+#--- Power State Table ---
+add_power_state RT_CORE -state RUN \
+    -logic_expr {VDD_RT == FULL_ON}
+add_power_state RT_CORE -state SLEEP \
+    -logic_expr {VDD_RT == RETENTION}
+add_power_state RT_CORE -state SAFE_STATE \
+    -logic_expr {VDD_RT == OFF}

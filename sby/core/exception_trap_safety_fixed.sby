@@ -33,12 +33,12 @@ check_ebreak_trap
 
 # Property 3: Illegal instruction always triggers trap
 check_illegal_trap
-    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+    assert property (@(posedge i_clk) disable iff (!i_rst_n))
         i_illegal |-> o_trap_valid
     );
 
 # Property 4: MRET does NOT trigger trap (it's a return)
 check_mret_no_trap
-    assert property (@(posedge i_clk) disable iff (!i_rst_n)
+    assert property (@(posedge i_clk) disable iff (!i_rst_n))
         (i_mret && !i_ecall && !i_ebreak && !i_illegal) |-> !o_trap_valid
     );

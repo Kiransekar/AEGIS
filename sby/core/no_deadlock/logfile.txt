@@ -1,0 +1,2 @@
+SBY 21:52:42 [no_deadlock] Removing directory '/home/kiran-sekar/AEGIS RV/sby/core/no_deadlock'.
+SBY 21:52:42 [no_deadlock] ERROR: sby file syntax error: unexpected section 'constraints', expected one of 'options, engines, script, autotune, file, files'

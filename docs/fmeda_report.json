@@ -1,0 +1,125 @@
+{
+  "timestamp": "2026-05-11T10:02:10.967093+00:00",
+  "fmeda": {
+    "entries": [
+      {
+        "fault_name": "TCLS_MISMATCH",
+        "severity": "LOW",
+        "diagnostic_coverage": 0.99,
+        "safety_mechanism": "2oo3 voting",
+        "covered_by_safety_annotation": false
+      },
+      {
+        "fault_name": "TCLS_QUARANTINE",
+        "severity": "LOW",
+        "diagnostic_coverage": 0.99,
+        "safety_mechanism": "Mismatch counter",
+        "covered_by_safety_annotation": false
+      },
+      {
+        "fault_name": "ECC_SINGLE",
+        "severity": "LOW",
+        "diagnostic_coverage": 0.99,
+        "safety_mechanism": "SECDED correction",
+        "covered_by_safety_annotation": false
+      },
+      {
+        "fault_name": "ECC_DOUBLE",
+        "severity": "MEDIUM",
+        "diagnostic_coverage": 0.99,
+        "safety_mechanism": "SECDED detection",
+        "covered_by_safety_annotation": false
+      },
+      {
+        "fault_name": "WATCHDOG_TIMEOUT",
+        "severity": "LOW",
+        "diagnostic_coverage": 0.9,
+        "safety_mechanism": "Windowed watchdog",
+        "covered_by_safety_annotation": true
+      },
+      {
+        "fault_name": "PMP_VIOLATION",
+        "severity": "HIGH",
+        "diagnostic_coverage": 0.99,
+        "safety_mechanism": "PMP trap",
+        "covered_by_safety_annotation": false
+      },
+      {
+        "fault_name": "SMU_FAULT",
+        "severity": "HIGH",
+        "diagnostic_coverage": 0.99,
+        "safety_mechanism": "SMU aggregation",
+        "covered_by_safety_annotation": true
+      },
+      {
+        "fault_name": "POWER_GLITCH",
+        "severity": "MEDIUM",
+        "diagnostic_coverage": 0.9,
+        "safety_mechanism": "Voltage monitor",
+        "covered_by_safety_annotation": false
+      },
+      {
+        "fault_name": "SCRUBBER_CORRECTED",
+        "severity": "MEDIUM",
+        "diagnostic_coverage": 0.99,
+        "safety_mechanism": "Background scrub",
+        "covered_by_safety_annotation": false
+      },
+      {
+        "fault_name": "CLOCK_MONITOR",
+        "severity": "MEDIUM",
+        "diagnostic_coverage": 0.9,
+        "safety_mechanism": "Clock monitor",
+        "covered_by_safety_annotation": false
+      },
+      {
+        "fault_name": "RETENTION_FAIL",
+        "severity": "MEDIUM",
+        "diagnostic_coverage": 0.99,
+        "safety_mechanism": "Restore verify",
+        "covered_by_safety_annotation": false
+      },
+      {
+        "fault_name": "SPU_VIOLATION",
+        "severity": "HIGH",
+        "diagnostic_coverage": 0.99,
+        "safety_mechanism": "SPU trap",
+        "covered_by_safety_annotation": false
+      },
+      {
+        "fault_name": "IOPMP_VIOLATION",
+        "severity": "HIGH",
+        "diagnostic_coverage": 0.99,
+        "safety_mechanism": "IOPMP trap",
+        "covered_by_safety_annotation": false
+      },
+      {
+        "fault_name": "AXI_TIMEOUT",
+        "severity": "HIGH",
+        "diagnostic_coverage": 0.9,
+        "safety_mechanism": "Timeout monitor",
+        "covered_by_safety_annotation": false
+      },
+      {
+        "fault_name": "SAFE_STATE_VIOLATION",
+        "severity": "HIGH",
+        "diagnostic_coverage": 0.99,
+        "safety_mechanism": "SMU safe-state",
+        "covered_by_safety_annotation": false
+      },
+      {
+        "fault_name": "PMHF_THRESHOLD",
+        "severity": "HIGH",
+        "diagnostic_coverage": 0.99,
+        "safety_mechanism": "PMHF counter",
+        "covered_by_safety_annotation": false
+      }
+    ],
+    "overall_diagnostic_coverage": 0.9756,
+    "safety_annotation_count": 229,
+    "fault_annotation_count": 2,
+    "asil_target": "ASIL-D",
+    "dc_target": 0.99,
+    "dc_target_met": false
+  }
+}

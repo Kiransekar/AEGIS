@@ -1,0 +1,31 @@
+SBY 21:53:22 [simple_test_test] Removing directory '/home/kiran-sekar/AEGIS RV/sby/core/simple_test_test'.
+SBY 21:53:22 [simple_test_assume] Removing directory '/home/kiran-sekar/AEGIS RV/sby/core/simple_test_assume'.
+SBY 21:53:22 [simple_test_cover] Removing directory '/home/kiran-sekar/AEGIS RV/sby/core/simple_test_cover'.
+SBY 21:53:22 [simple_test_cover] Copy '/home/kiran-sekar/AEGIS RV/sby/core/../../rtl/core/rt_exception_handler.v' to '/home/kiran-sekar/AEGIS RV/sby/core/simple_test_cover/src/rt_exception_handler.v'.
+SBY 21:53:22 [simple_test_cover] engine_0: smtbmc z3
+SBY 21:53:22 [simple_test_cover] base: starting process "cd simple_test_cover/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY 21:53:22 [simple_test_cover] base: finished (returncode=0)
+SBY 21:53:22 [simple_test_cover] prep: starting process "cd simple_test_cover/model; yosys -ql design_prep.log design_prep.ys"
+SBY 21:53:22 [simple_test_cover] prep: finished (returncode=0)
+SBY 21:53:22 [simple_test_cover] smt2: starting process "cd simple_test_cover/model; yosys -ql design_smt2.log design_smt2.ys"
+SBY 21:53:22 [simple_test_cover] smt2: finished (returncode=0)
+SBY 21:53:22 [simple_test_cover] engine_0: starting process "cd simple_test_cover; yosys-smtbmc -s z3 --presat --noprogress -t 5  --append 0 --dump-vcd engine_0/trace.vcd --dump-yw engine_0/trace.yw --dump-vlogtb engine_0/trace_tb.v --dump-smtc engine_0/trace.smtc model/design_smt2.smt2"
+SBY 21:53:22 [simple_test_cover] engine_0: ##   0:00:00  Solver: z3
+SBY 21:53:22 [simple_test_cover] engine_0: ##   0:00:00  Checking assumptions in step 0..
+SBY 21:53:23 [simple_test_cover] engine_0: ##   0:00:00  Checking assertions in step 0..
+SBY 21:53:23 [simple_test_cover] engine_0: ##   0:00:00  Checking assumptions in step 1..
+SBY 21:53:23 [simple_test_cover] engine_0: ##   0:00:00  Checking assertions in step 1..
+SBY 21:53:23 [simple_test_cover] engine_0: ##   0:00:00  Checking assumptions in step 2..
+SBY 21:53:23 [simple_test_cover] engine_0: ##   0:00:00  Checking assertions in step 2..
+SBY 21:53:23 [simple_test_cover] engine_0: ##   0:00:00  Checking assumptions in step 3..
+SBY 21:53:23 [simple_test_cover] engine_0: ##   0:00:00  Checking assertions in step 3..
+SBY 21:53:23 [simple_test_cover] engine_0: ##   0:00:00  Checking assumptions in step 4..
+SBY 21:53:23 [simple_test_cover] engine_0: ##   0:00:00  Checking assertions in step 4..
+SBY 21:53:23 [simple_test_cover] engine_0: ##   0:00:00  Status: passed
+SBY 21:53:23 [simple_test_cover] engine_0: finished (returncode=0)
+SBY 21:53:23 [simple_test_cover] engine_0: Status returned by engine: pass
+SBY 21:53:23 [simple_test_cover] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:01 (1)
+SBY 21:53:23 [simple_test_cover] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 21:53:23 [simple_test_cover] summary: engine_0 (smtbmc z3) returned pass
+SBY 21:53:23 [simple_test_cover] summary: engine_0 did not produce any traces
+SBY 21:53:23 [simple_test_cover] DONE (PASS, rc=0)

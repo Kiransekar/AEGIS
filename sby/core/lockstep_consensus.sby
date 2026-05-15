@@ -1,0 +1,18 @@
+[options]
+mode bmc
+depth 20
+
+[script]
+read_verilog -sv ../../rtl/core/tcls_voter.v
+prep -top tcls_voter
+
+[files]
+../../rtl/core/tcls_voter.v
+
+[engines]
+smtbmc z3
+
+[tasks]
+lockstep_consensus
+    assert property (@(posedge i_clk) disable iff (!i_rst_n))
+        i_tcls_en && i_peer_ok == 2'b11 |-> !o_tcls_fault;

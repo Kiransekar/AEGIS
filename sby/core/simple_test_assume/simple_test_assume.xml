@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+<testsuite timestamp="2026-05-12T21:53:23" hostname="kiran-sekar-Latitude-E5450" package="simple_test" id="0" name="assume" tests="0" errors="0" failures="0" time="0" skipped="0">
+<properties>
+<property name="os" value="Linux"/>
+<property name="expect" value="PASS"/>
+<property name="status" value="PASS"/>
+</properties>
+<testcase classname="assume" name="build execution" time="0">
+</testcase>
+<system-out>SBY 21:53:22 [simple_test_test] Removing directory '/home/kiran-sekar/AEGIS RV/sby/core/simple_test_test'.
+SBY 21:53:22 [simple_test_assume] Removing directory '/home/kiran-sekar/AEGIS RV/sby/core/simple_test_assume'.
+SBY 21:53:22 [simple_test_assume] Copy '/home/kiran-sekar/AEGIS RV/sby/core/../../rtl/core/rt_exception_handler.v' to '/home/kiran-sekar/AEGIS RV/sby/core/simple_test_assume/src/rt_exception_handler.v'.
+SBY 21:53:22 [simple_test_assume] engine_0: smtbmc z3
+SBY 21:53:22 [simple_test_assume] base: starting process &quot;cd simple_test_assume/src; yosys -ql ../model/design.log ../model/design.ys&quot;
+SBY 21:53:22 [simple_test_assume] base: finished (returncode=0)
+SBY 21:53:22 [simple_test_assume] prep: starting process &quot;cd simple_test_assume/model; yosys -ql design_prep.log design_prep.ys&quot;
+SBY 21:53:22 [simple_test_assume] prep: finished (returncode=0)
+SBY 21:53:22 [simple_test_assume] smt2: starting process &quot;cd simple_test_assume/model; yosys -ql design_smt2.log design_smt2.ys&quot;
+SBY 21:53:22 [simple_test_assume] smt2: finished (returncode=0)
+SBY 21:53:22 [simple_test_assume] engine_0: starting process &quot;cd simple_test_assume; yosys-smtbmc -s z3 --presat --noprogress -t 5  --append 0 --dump-vcd engine_0/trace.vcd --dump-yw engine_0/trace.yw --dump-vlogtb engine_0/trace_tb.v --dump-smtc engine_0/trace.smtc model/design_smt2.smt2&quot;
+SBY 21:53:22 [simple_test_assume] engine_0: ##   0:00:00  Solver: z3
+SBY 21:53:22 [simple_test_assume] engine_0: ##   0:00:00  Checking assumptions in step 0..
+SBY 21:53:23 [simple_test_assume] engine_0: ##   0:00:00  Checking assertions in step 0..
+SBY 21:53:23 [simple_test_assume] engine_0: ##   0:00:00  Checking assumptions in step 1..
+SBY 21:53:23 [simple_test_assume] engine_0: ##   0:00:00  Checking assertions in step 1..
+SBY 21:53:23 [simple_test_assume] engine_0: ##   0:00:00  Checking assumptions in step 2..
+SBY 21:53:23 [simple_test_assume] engine_0: ##   0:00:00  Checking assertions in step 2..
+SBY 21:53:23 [simple_test_assume] engine_0: ##   0:00:00  Checking assumptions in step 3..
+SBY 21:53:23 [simple_test_assume] engine_0: ##   0:00:00  Checking assertions in step 3..
+SBY 21:53:23 [simple_test_assume] engine_0: ##   0:00:00  Checking assumptions in step 4..
+SBY 21:53:23 [simple_test_assume] engine_0: ##   0:00:00  Checking assertions in step 4..
+SBY 21:53:23 [simple_test_assume] engine_0: ##   0:00:00  Status: passed
+SBY 21:53:23 [simple_test_assume] engine_0: finished (returncode=0)
+SBY 21:53:23 [simple_test_assume] engine_0: Status returned by engine: pass
+SBY 21:53:23 [simple_test_assume] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:01 (1)
+SBY 21:53:23 [simple_test_assume] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 21:53:23 [simple_test_assume] summary: engine_0 (smtbmc z3) returned pass
+SBY 21:53:23 [simple_test_assume] summary: engine_0 did not produce any traces
+SBY 21:53:23 [simple_test_assume] DONE (PASS, rc=0)
+</system-out>
+<system-err>
+</system-err>
+</testsuite>
+</testsuites>

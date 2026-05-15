@@ -1,0 +1,8 @@
+# running in no_deadlock_fixed_assume/src/
+read_verilog -sv ../../rtl/core/rt_exception_handler.v
+prep -top rt_exception_handler
+
+hierarchy -smtcheck
+rename -witness
+write_jny -no-connections ../model/design.json
+write_rtlil ../model/design.il

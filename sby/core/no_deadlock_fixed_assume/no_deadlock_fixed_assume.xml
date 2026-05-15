@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+<testsuite timestamp="2026-05-12T21:52:57" hostname="kiran-sekar-Latitude-E5450" package="no_deadlock_fixed" id="0" name="assume" tests="1" errors="1" failures="0" time="0" skipped="0">
+<properties>
+<property name="os" value="Linux"/>
+<property name="expect" value="PASS"/>
+<property name="status" value="ERROR"/>
+</properties>
+<testcase classname="assume" name="assume" time="0">
+<error type="ERROR"/>
+</testcase>
+<system-out>SBY 21:52:57 [no_deadlock_fixed_no_deadlock_check] Removing directory '/home/kiran-sekar/AEGIS RV/sby/core/no_deadlock_fixed_no_deadlock_check'.
+SBY 21:52:57 [no_deadlock_fixed_assume] Removing directory '/home/kiran-sekar/AEGIS RV/sby/core/no_deadlock_fixed_assume'.
+SBY 21:52:57 [no_deadlock_fixed_assume] Copy '/home/kiran-sekar/AEGIS RV/sby/core/../../rtl/core/rt_exception_handler.v' to '/home/kiran-sekar/AEGIS RV/sby/core/no_deadlock_fixed_assume/src/rt_exception_handler.v'.
+SBY 21:52:57 [no_deadlock_fixed_assume] engine_0: smtbmc z3
+SBY 21:52:57 [no_deadlock_fixed_assume] base: starting process &quot;cd no_deadlock_fixed_assume/src; yosys -ql ../model/design.log ../model/design.ys&quot;
+SBY 21:52:57 [no_deadlock_fixed_assume] base: ERROR: Can't open input file `../../rtl/core/rt_exception_handler.v' for reading: No such file or directory
+SBY 21:52:57 [no_deadlock_fixed_assume] base: finished (returncode=1)
+SBY 21:52:57 [no_deadlock_fixed_assume] base: task failed. ERROR.
+SBY 21:52:57 [no_deadlock_fixed_assume] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 21:52:57 [no_deadlock_fixed_assume] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 21:52:57 [no_deadlock_fixed_assume] summary: engine_0 (smtbmc z3) did not return a status
+SBY 21:52:57 [no_deadlock_fixed_assume] summary: engine_0 did not produce any traces
+SBY 21:52:57 [no_deadlock_fixed_assume] DONE (ERROR, rc=16)
+</system-out>
+<system-err>
+</system-err>
+</testsuite>
+</testsuites>

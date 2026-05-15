@@ -1,0 +1,17 @@
+[options]
+mode bmc
+depth 100
+
+[engines]
+smtbmc z3
+
+[script]
+read_verilog -sv ../../rtl/core/rt_exception_handler.v
+prep -top rt_exception_handler
+
+[constraints]
+# Assert: PC always advances or valid trap occurs within 10 cycles
+assert always @(posedge i_clk) (pc_valid || trap_pending)
+
+[files]
+../../rtl/core/rt_exception_handler.v

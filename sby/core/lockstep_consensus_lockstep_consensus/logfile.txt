@@ -1,0 +1,3 @@
+SBY 20:43:08 [lockstep_consensus_lockstep_consensus] Removing directory '/home/kiran-sekar/AEGIS RV/sby/core/lockstep_consensus_lockstep_consensus'.
+SBY 20:43:08 [lockstep_consensus_lockstep_consensus] Copy '/home/kiran-sekar/AEGIS RV/sby/core/../../rtl/core/tcls_voter.v' to '/home/kiran-sekar/AEGIS RV/sby/core/lockstep_consensus_lockstep_consensus/src/tcls_voter.v'.
+SBY 20:43:08 [lockstep_consensus_lockstep_consensus] engine_0: smtbmc z3

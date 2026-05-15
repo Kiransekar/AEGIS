@@ -1,0 +1,14 @@
+[options]
+mode bmc
+depth 20
+
+[script]
+read_verilog -sv ../../rtl/core/tcls_voter.v
+prep -top tcls_voter
+
+[files]
+../../rtl/core/tcls_voter.v
+
+[engines]
+smtbmc z3
+

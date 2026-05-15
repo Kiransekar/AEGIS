@@ -1,0 +1,53 @@
+# AEGIS-RV Synthesis Script (Corrected Paths, Module, & PDK Location)
+read_verilog -sv rtl/core/aegis_rt_core.v
+read_verilog -sv rtl/core/rt_pipeline_if.v
+read_verilog -sv rtl/core/rt_pipeline_controller.v
+read_verilog -sv rtl/core/rv32c_expander.v
+read_verilog -sv rtl/core/rt_decoder.v
+read_verilog -sv rtl/core/rt_register_file.v
+read_verilog -sv rtl/core/rt_alu.v
+read_verilog -sv rtl/core/rt_fpu.v
+read_verilog -sv rtl/core/rt_muldiv.v
+read_verilog -sv rtl/core/rt_atomic.v
+read_verilog -sv rtl/core/rt_watchdog.v
+read_verilog -sv rtl/core/rt_branch_unit.v
+read_verilog -sv rtl/core/rt_csr_unit.v
+read_verilog -sv rtl/core/xdrone_decoder.v
+read_verilog -sv rtl/core/xdrone_qmul.v
+read_verilog -sv rtl/core/xdrone_kalman.v
+read_verilog -sv rtl/core/xdrone_dispatcher.v
+read_verilog -sv rtl/core/tcls_voter.v
+read_verilog -sv rtl/core/tcls_mismatch_counter.v
+read_verilog -sv rtl/core/rt_interrupt_controller.v
+read_verilog -sv rtl/core/rt_exception_handler.v
+read_verilog -sv rtl/core/rt_dft_scan.v
+read_verilog -sv rtl/memory/ecc_secdec_32.v
+read_verilog -sv rtl/memory/ecc_scrubber.v
+read_verilog -sv rtl/memory/scratchpad_bank.v
+read_verilog -sv rtl/memory/scratchpad_ctrl.v
+read_verilog -sv rtl/memory/memory_mux.v
+read_verilog -sv rtl/security/smu.v
+read_verilog -sv rtl/security/secure_boot_stub.v
+read_verilog -sv rtl/security/crypto_accel_if.v
+read_verilog -sv rtl/security/constant_time_wrapper.v
+read_verilog -sv rtl/security/pmp_lite.v
+read_verilog -sv rtl/power/power_domain_if.v
+read_verilog -sv rtl/power/isolation_cell_1bit.v
+read_verilog -sv rtl/power/retention_reg_32.v
+read_verilog -sv rtl/power/wake_sequencer.v
+read_verilog -sv rtl/power/power_orchestrator.v
+read_verilog -sv rtl/interconnect/axi_lite_rt_slice.v
+read_verilog -sv rtl/interconnect/tt_arbiter_4master.v
+read_verilog -sv rtl/interconnect/iopmp_ctrl.v
+read_verilog -sv rtl/interconnect/axi_timeout_monitor.v
+
+read_liberty -lib /home/kiran-sekar/OpenROAD/test/sky130hd/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+hierarchy -top aegis_rt_core
+proc; opt; memory; fsm; opt
+techmap; opt
+abc -liberty /home/kiran-sekar/OpenROAD/test/sky130hd/sky130_fd_sc_hd__tt_025C_1v80.lib
+clean; opt
+
+write_verilog -noattr outputs/aegis_rt_core_syn.v
+stat

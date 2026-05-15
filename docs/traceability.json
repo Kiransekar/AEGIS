@@ -1,0 +1,1945 @@
+{
+  "timestamp": "2026-05-11T10:01:32.791475+00:00",
+  "requirements": [],
+  "traceability": [
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/aegis_top.v:13",
+      "content": "AEGIS-TOP-001 \u2014 ARCHITECTURE.md \u00a72 (SoC Top)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/aegis_top.v:14",
+      "content": "Domain isolation at top level; independent clock/reset per domain",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/aegis_top.v:15",
+      "content": "DFT scan interface fuse-gated in production",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/aegis_top.v:67",
+      "content": "Scan pins must be tied off in production silicon",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/aegis_top.v:76",
+      "content": "RT domain uses independent clock and reset for isolation",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/aegis_top.v:108",
+      "content": "Application and Security domains not instantiated in Phase 2",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/aegis_top.v:113",
+      "content": "Scan enable must be tied to 0 in production",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/aegis_rt_top.v:13",
+      "content": "AEGIS-RT-TOP-001 \u2014 ARCHITECTURE.md \u00a72 (RT Domain)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/aegis_rt_top.v:14",
+      "content": "All safety mechanisms integrated at this level",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/aegis_rt_top.v:15",
+      "content": "CSR outputs wired to all submodules for deterministic config",
+      "test_ref": null,
+      "fw_ref": "firmware/rt_test.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/aegis_rt_top.v:100",
+      "content": "Both peers OK (normal operation)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/aegis_rt_top.v:137",
+      "content": "CSR-controlled scrub enable",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/aegis_rt_top.v:138",
+      "content": "CSR-controlled interval",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/aegis_rt_top.v:166",
+      "content": "CSR-controlled sleep request",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/aegis_rt_top.v:167",
+      "content": "CSR-controlled wake request",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/aegis_rt_top.v:224",
+      "content": "Deny-by-default; CSR-configured regions",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/aegis_rt_top.v:235",
+      "content": "Machine mode always",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/tcls_voter.v:13",
+      "content": "AEGIS-RT-TCLS-001 \u2014 ARCHITECTURE.md \u00a75 (Lockstep)",
+      "test_ref": "tb/core/tcls_voter_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/tcls_voter.v:14",
+      "content": "2oo3 voting ensures correct output even with single core fault;",
+      "test_ref": "tb/core/tcls_voter_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/tcls_voter.v:57",
+      "content": "Output is majority of 3 inputs; handles single core fault",
+      "test_ref": "tb/core/tcls_voter_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/tcls_voter.v:80",
+      "content": "Any pairwise mismatch is flagged as a single-cycle pulse",
+      "test_ref": "tb/core/tcls_voter_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/tcls_voter.v:91",
+      "content": "Counter resets on match; accumulates on mismatch",
+      "test_ref": "tb/core/tcls_voter_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/tcls_voter.v:93",
+      "content": "AEGIS-RT-TCLS-002 \u2014 Mismatch counter (ISO 26262-5:2018 \u00a78.4.3)",
+      "test_ref": "tb/core/tcls_voter_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/tcls_voter.v:101",
+      "content": "Increment counter on mismatch (saturate at threshold)",
+      "test_ref": "tb/core/tcls_voter_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/tcls_voter.v:106",
+      "content": "Reset on match (prevents transient noise accumulation)",
+      "test_ref": "tb/core/tcls_voter_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/tcls_voter.v:115",
+      "content": "Quarantine triggered when mismatch count reaches threshold",
+      "test_ref": "tb/core/tcls_voter_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/tcls_voter.v:117",
+      "content": "AEGIS-RT-TCLS-003 \u2014 Quarantine timing (ISO 26262-5:2018 \u00a78.4.3)",
+      "test_ref": "tb/core/tcls_voter_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/tcls_voter.v:129",
+      "content": "Quarantine acknowledged \u2014 promote spare core",
+      "test_ref": "tb/core/tcls_voter_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/tcls_voter.v:134",
+      "content": "Threshold reached \u2014 initiate quarantine",
+      "test_ref": "tb/core/tcls_voter_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/xdrone_dispatcher.v:13",
+      "content": "AEGIS-RT-XDR-002 \u2014 ARCHITECTURE.md \u00a77 (Xdrone Extension)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_dispatcher.v:15",
+      "content": "All Xdrone ops have fixed latency (no data-dependent timing)",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_dispatcher.v:56",
+      "content": "Fixed latency per opcode \u2014 no data-dependent timing",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_dispatcher.v:109",
+      "content": "dt=1.0 (Q8.8) \u2014 fixed for RT determinism",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_dispatcher.v:135",
+      "content": "Fixed latency per opcode",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_dispatcher.v:147",
+      "content": "Wait for sub-module valid or cycle count",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_dispatcher.v:164",
+      "content": "Generic ops use cycle counter",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_dispatcher.v:183",
+      "content": "Default prevents latch inference",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/xdrone_decoder.v:13",
+      "content": "AEGIS-RT-XDR-001 \u2014 ARCHITECTURE.md \u00a77 (Xdrone Extension)",
+      "test_ref": "tb/core/xdrone_decoder_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_decoder.v:15",
+      "content": "Fixed-latency dispatch for all Xdrone operations",
+      "test_ref": "tb/core/xdrone_decoder_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_decoder.v:35",
+      "content": "Xdrone uses custom-0 (0x0B) and custom-1 (0x2B) opcode space",
+      "test_ref": "tb/core/xdrone_decoder_tb.v",
+      "fw_ref": "firmware/rt_test.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_decoder.v:45",
+      "content": "R-type format for Xdrone instructions",
+      "test_ref": "tb/core/xdrone_decoder_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/xdrone_qmul.v:17",
+      "content": "AEGIS-XDRONE-QMUL-001 \u2014 ARCHITECTURE.md \u00a74 (Xdrone)",
+      "test_ref": "tb/core/xdrone_qmul_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_qmul.v:19",
+      "content": "Fixed-point arithmetic with saturating overflow",
+      "test_ref": "tb/core/xdrone_qmul_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_qmul.v:20",
+      "content": "All intermediate products computed in 32-bit to prevent overflow",
+      "test_ref": "tb/core/xdrone_qmul_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_qmul.v:99",
+      "content": "Products computed from input ports, not registered values",
+      "test_ref": "tb/core/xdrone_qmul_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_qmul.v:133",
+      "content": "Q8.8 products are Q16.16; right-shift by 8 to rescale to Q8.8",
+      "test_ref": "tb/core/xdrone_qmul_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/rt_decoder.v:26",
+      "content": "AEGIS-RT-DEC-001 \u2014 ARCHITECTURE.md \u00a73 (Decoder)",
+      "test_ref": "tb/core/rt_decoder_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_decoder.v:28",
+      "content": "Illegal instruction \u2192 trap to handler (no undefined behavior)",
+      "test_ref": "tb/core/rt_decoder_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_decoder.v:29",
+      "content": "All opcodes have explicit decode (no implicit defaults)",
+      "test_ref": "tb/core/rt_decoder_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_decoder.v:99",
+      "content": "Illegal instruction trap",
+      "test_ref": "tb/core/rt_decoder_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_decoder.v:158",
+      "content": "All immediates sign-extended to 32 bits",
+      "test_ref": "tb/core/rt_decoder_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_decoder.v:180",
+      "content": "Compressed instructions expanded to 32-bit equivalents",
+      "test_ref": "tb/core/rt_decoder_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_decoder.v:188",
+      "content": "M ops share opcode 0x33 with R-type; funct7[5:4]=01",
+      "test_ref": "tb/core/rt_decoder_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_decoder.v:199",
+      "content": "Explicit case for every opcode; default = illegal",
+      "test_ref": "tb/core/rt_decoder_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_decoder.v:262",
+      "content": "Compressed instructions should be expanded in fetch",
+      "test_ref": "tb/core/rt_decoder_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_decoder.v:323",
+      "content": "Reserved funct3",
+      "test_ref": "tb/core/rt_decoder_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_decoder.v:508",
+      "content": "FLW \u2014 load float to FPU register",
+      "test_ref": "tb/core/rt_decoder_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_decoder.v:568",
+      "content": "All other opcodes are illegal",
+      "test_ref": "tb/core/rt_decoder_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/rt_exception_handler.v:13",
+      "content": "AEGIS-RT-EXC-001 \u2014 ARCHITECTURE.md \u00a75 (Exception Handling)",
+      "test_ref": "tb/core/rt_exception_handler_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_exception_handler.v:15",
+      "content": "All exceptions trap to machine mode \u2014 no delegation",
+      "test_ref": "tb/core/rt_exception_handler_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_exception_handler.v:16",
+      "content": "MRET restores previous privilege and interrupt state",
+      "test_ref": "tb/core/rt_exception_handler_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_exception_handler.v:50",
+      "content": "RISC-V privileged spec compliant",
+      "test_ref": "tb/core/rt_exception_handler_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_exception_handler.v:57",
+      "content": "Fixed vector address",
+      "test_ref": "tb/core/rt_exception_handler_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_exception_handler.v:62",
+      "content": "Priority: MRET > ECALL > EBREAK > Illegal",
+      "test_ref": "tb/core/rt_exception_handler_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_exception_handler.v:73",
+      "content": "MRET returns from handler, restores mepc",
+      "test_ref": "tb/core/rt_exception_handler_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_exception_handler.v:94",
+      "content": "Shadow bank swap on ECALL/EBREAK (context switch)",
+      "test_ref": "tb/core/rt_exception_handler_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/rt_atomic.v:14",
+      "content": "AEGIS-RT-ATOM-001 \u2014 ARCHITECTURE.md \u00a73 (A Extension)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_atomic.v:16",
+      "content": "Reservation set invalidated on any write to reserved address",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_atomic.v:17",
+      "content": "SC.W fail returns 1 (non-zero) per RISC-V spec",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_atomic.v:51",
+      "content": "Single-entry reservation set (sufficient for RT single-core)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_atomic.v:59",
+      "content": "Sets reservation on current address",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_atomic.v:80",
+      "content": "Reservation matches \u2014 SC succeeds",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_atomic.v:84",
+      "content": "No reservation or address mismatch \u2014 SC fails",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_atomic.v:90",
+      "content": "Invalidate reservation on external write to same address",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/tcls_mismatch_counter.v:13",
+      "content": "AEGIS-RT-TCLS-004 \u2014 Mismatch counter (ISO 26262-5:2018 \u00a78.4.3)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/tcls_mismatch_counter.v:14",
+      "content": "Counter resets on match; saturates at threshold",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/tcls_mismatch_counter.v:37",
+      "content": "Increment on mismatch, saturate at threshold",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/tcls_mismatch_counter.v:42",
+      "content": "Reset on match (no false accumulation)",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/rt_alu.v:14",
+      "content": "AEGIS-RT-ALU-001 \u2014 ARCHITECTURE.md \u00a73 (ALU)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_alu.v:16",
+      "content": "FPU ops delegated to rt_fpu with FTZ mode",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_alu.v:85",
+      "content": "FPU ops delegated to rt_fpu \u2014 ALU returns 0 if reached",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_alu.v:88",
+      "content": "Default prevents latch",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/rt_watchdog.v:14",
+      "content": "AEGIS-RT-WDG-001 \u2014 ARCHITECTURE.md \u00a73 (Watchdog)",
+      "test_ref": "tb/core/rt_watchdog_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_watchdog.v:16",
+      "content": "Watchdog timeout \u2192 SMU fault \u2192 safe-state (irreversible)",
+      "test_ref": "tb/core/rt_watchdog_tb.v",
+      "fw_ref": "firmware/rt_test.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_watchdog.v:17",
+      "content": "Counter cannot be disabled \u2014 only kicked (restarted)",
+      "test_ref": "tb/core/rt_watchdog_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_watchdog.v:42",
+      "content": "Counts down from i_timeout; kick resets to i_timeout",
+      "test_ref": "tb/core/rt_watchdog_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_watchdog.v:58",
+      "content": "Load timeout on enable transition",
+      "test_ref": "tb/core/rt_watchdog_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_watchdog.v:62",
+      "content": "Kick restarts the counter",
+      "test_ref": "tb/core/rt_watchdog_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_watchdog.v:66",
+      "content": "Counter expired \u2014 timeout!",
+      "test_ref": "tb/core/rt_watchdog_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_watchdog.v:69",
+      "content": "Timeout is latching \u2014 requires reset to clear",
+      "test_ref": "tb/core/rt_watchdog_tb.v",
+      "fw_ref": "firmware/rt_test.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/rt_csr_unit.v:13",
+      "content": "AEGIS-RT-CSR-001 \u2014 ARCHITECTURE.md \u00a79 (CSR Map)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_csr_unit.v:14",
+      "content": "Machine-mode only access prevents unprivileged CSR modification",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_csr_unit.v:57",
+      "content": "Only Machine mode (priv=2'b11) can access CSRs",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/rt_csr_unit.v:58",
+      "content": "AEGIS-RT-CSR-002 \u2014 Privilege gating (ISO 26262-6:2018 \u00a76.4.3)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_csr_unit.v:85",
+      "content": "Reserved reads as 0",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_csr_unit.v:94",
+      "content": "Writes only allowed in Machine mode",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/rt_pipeline_if.v:13",
+      "content": "AEGIS-RT-PIPE-001 \u2014 Pipeline interface (ARCHITECTURE.md \u00a73)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_pipeline_if.v:66",
+      "content": "Pipeline always advances unless stalled",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/rt_muldiv.v:17",
+      "content": "AEGIS-RT-MULDIV-001 \u2014 ARCHITECTURE.md \u00a73 (M Extension)",
+      "test_ref": "tb/core/rt_muldiv_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_muldiv.v:19",
+      "content": "Divide-by-zero returns all-ones; signed overflow returns max",
+      "test_ref": "tb/core/rt_muldiv_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_muldiv.v:20",
+      "content": "No data-dependent timing \u2014 dummy cycles pad fast results",
+      "test_ref": "tb/core/rt_muldiv_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_muldiv.v:76",
+      "content": "All multiply variants computed; select based on funct3",
+      "test_ref": "tb/core/rt_muldiv_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_muldiv.v:98",
+      "content": "Divide-by-zero \u2192 all-ones; signed overflow \u2192 max positive",
+      "test_ref": "tb/core/rt_muldiv_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_muldiv.v:108",
+      "content": "Divide by zero \u2192 -1",
+      "test_ref": "tb/core/rt_muldiv_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_muldiv.v:112",
+      "content": "Signed overflow \u2192 max positive",
+      "test_ref": "tb/core/rt_muldiv_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_muldiv.v:157",
+      "content": "Dummy cycles pad fast results for constant timing",
+      "test_ref": "tb/core/rt_muldiv_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_muldiv.v:192",
+      "content": "Output result at fixed latency",
+      "test_ref": "tb/core/rt_muldiv_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/rt_branch_unit.v:13",
+      "content": "AEGIS-RT-BRANCH-001 \u2014 ARCHITECTURE.md \u00a75 (Determinism)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_branch_unit.v:15",
+      "content": "Fixed branch latency prevents timing side-channels",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_branch_unit.v:43",
+      "content": "No data-dependent timing (constant evaluation time)",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_branch_unit.v:50",
+      "content": "IRQ redirect has absolute priority",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/rv32c_expander.v:14",
+      "content": "AEGIS-RT-C-001 \u2014 ARCHITECTURE.md \u00a73 (Compressed ISA)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rv32c_expander.v:16",
+      "content": "Unrecognized compressed instructions \u2192 illegal 32-bit instruction",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rv32c_expander.v:17",
+      "content": "Expansion is deterministic \u2014 no data-dependent timing",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rv32c_expander.v:49",
+      "content": "Default = illegal instruction (0x00000000 = ADDI x0, x0, 0)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/rt_pipeline_controller.v:14",
+      "content": "AEGIS-RT-PIPE-001 \u2014 ARCHITECTURE.md \u00a73 (Pipeline)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_pipeline_controller.v:16",
+      "content": "No data hazard may produce incorrect result \u2014 stall or forward",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_pipeline_controller.v:17",
+      "content": "All stalls are deterministic \u2014 no data-dependent stall duration",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_pipeline_controller.v:61",
+      "content": "Detect when decode reads a register that execute or writeback",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_pipeline_controller.v:74",
+      "content": "Must stall 1 cycle \u2014 load data not available until WB",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_pipeline_controller.v:81",
+      "content": "MULDIV/FPU/Xdrone occupy EX for multiple cycles",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_pipeline_controller.v:93",
+      "content": "Flush on branch mispredict (not implemented in Phase 2 \u2014",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_pipeline_controller.v:100",
+      "content": "Forward from EX or WB to avoid unnecessary stalls",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/rt_register_file.v:13",
+      "content": "AEGIS-RT-REG-001 \u2014 ARCHITECTURE.md \u00a75 (Context Switch)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_register_file.v:14",
+      "content": "Shadow banks enable \u226418-cycle hardware context swap",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_register_file.v:45",
+      "content": "Register x0 always reads as 0 (RISC-V spec)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_register_file.v:51",
+      "content": "Shadow bank preserves previous context for fast swap",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_register_file.v:61",
+      "content": "x0 is hardwired to 0; writes to x0 are ignored",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_register_file.v:68",
+      "content": "Swap active and shadow banks",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_register_file.v:76",
+      "content": "x0 hardwired to 0 \u2014 writes ignored",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_register_file.v:87",
+      "content": "x0 always returns 0",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:17",
+      "content": "AEGIS-RT-CORE-001 \u2014 ARCHITECTURE.md \u00a73 (RT Core)",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:18",
+      "content": "Deterministic timing; no cache miss paths; fixed interrupt latency",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:73",
+      "content": "4-stage pipeline \u2014 IF, ID, EX, WB + Xdrone multi-cycle",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:154",
+      "content": "If fetch returns compressed, expand; otherwise pass through",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:226",
+      "content": "No data hazard may produce incorrect result",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:261",
+      "content": "Forward from EX or WB to resolve RAW hazards",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:286",
+      "content": "EX forwarding uses wb_result (which captures prior EX output)",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": "firmware/syscalls.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:295",
+      "content": "Use forwarded data when not stalled",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:319",
+      "content": "FTZ prevents subnormal latency variance",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:338",
+      "content": "FTZ always enabled for RT determinism",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:392",
+      "content": "Timeout \u2192 SMU fault \u2192 safe-state",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": "firmware/rt_test.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:401",
+      "content": "Always enabled in RT mode",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:412",
+      "content": "All exceptions trap to machine mode",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:542",
+      "content": "4-stage in-order + Xdrone multi-cycle",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:592",
+      "content": "SMU safe-state or debug halt freezes pipeline",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": "firmware/rt_test.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:594",
+      "content": "Pipeline stall \u2014 hold current state",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:647",
+      "content": "Context switch on ECALL/EBREAK \u2192 shadow bank swap",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:687",
+      "content": "Shadow bank swap on IRQ entry",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:730",
+      "content": "Shadow bank swap + PC redirect to handler",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/aegis_rt_core.v:765",
+      "content": "WDG timeout",
+      "test_ref": "tb/core/aegis_rt_core_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/rt_interrupt_controller.v:13",
+      "content": "AEGIS-RT-INT-001 \u2014 ARCHITECTURE.md \u00a75 (Determinism)",
+      "test_ref": "tb/core/rt_interrupt_controller_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_interrupt_controller.v:14",
+      "content": "Fixed 12-cycle entry; no cache miss paths; priority encoder hardwired",
+      "test_ref": "tb/core/rt_interrupt_controller_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_interrupt_controller.v:53",
+      "content": "Hardwired priority \u2014 highest pending + enabled IRQ wins",
+      "test_ref": "tb/core/rt_interrupt_controller_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_interrupt_controller.v:72",
+      "content": "Priority encoder output is one-hot; convert to index for vector table",
+      "test_ref": "tb/core/rt_interrupt_controller_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_interrupt_controller.v:88",
+      "content": "Fixed 12-cycle entry regardless of IRQ source",
+      "test_ref": "tb/core/rt_interrupt_controller_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/rt_interrupt_controller.v:90",
+      "content": "AEGIS-RT-INT-002 \u2014 Entry latency (ISO 26262-6:2018 Table D.3)",
+      "test_ref": "tb/core/rt_interrupt_controller_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_interrupt_controller.v:146",
+      "content": "Default prevents latch inference",
+      "test_ref": "tb/core/rt_interrupt_controller_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/rt_dft_scan.v:14",
+      "content": "AEGIS-RT-DFT-001 \u2014 ARCHITECTURE.md \u00a76 (DFT)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_dft_scan.v:15",
+      "content": "Scan enable must be hardwired to 0 in production (fuse-gated)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_dft_scan.v:16",
+      "content": "Scan chains must not compromise TCLS lockstep integrity",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_dft_scan.v:42",
+      "content": "In functional mode (scan_enable=0), these are don't-care",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_dft_scan.v:55",
+      "content": "Shift scan data when in test mode",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/rt_dft_scan.v:69",
+      "content": "Scan enable must be tied to 0 in production silicon",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/core/xdrone_kalman.v:17",
+      "content": "AEGIS-XDRONE-KALMAN-001 \u2014 ARCHITECTURE.md \u00a74 (Xdrone)",
+      "test_ref": "tb/core/xdrone_kalman_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_kalman.v:19",
+      "content": "Fixed-point with saturating arithmetic",
+      "test_ref": "tb/core/xdrone_kalman_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_kalman.v:20",
+      "content": "No floating-point \u2014 deterministic fixed-point only",
+      "test_ref": "tb/core/xdrone_kalman_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/core/xdrone_kalman.v:80",
+      "content": "All operations use deterministic fixed-point",
+      "test_ref": "tb/core/xdrone_kalman_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/security/constant_time_wrapper.v:13",
+      "content": "AEGIS-SEC-CT-001 \u2014 CERTIFICATION.md \u00a73.2 (Side-Channel Resistance)",
+      "test_ref": "tb/security/constant_time_wrapper_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/constant_time_wrapper.v:15",
+      "content": "Dummy operation insertion ensures constant power profile",
+      "test_ref": "tb/security/constant_time_wrapper_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/constant_time_wrapper.v:60",
+      "content": "Latch result from real operation",
+      "test_ref": "tb/security/constant_time_wrapper_tb.v",
+      "fw_ref": "firmware/rt_test.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/security/pmp_lite.v:13",
+      "content": "AEGIS-SEC-PMP-001 \u2014 ARCHITECTURE.md \u00a74 (Security)",
+      "test_ref": "tb/security/pmp_lite_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/pmp_lite.v:14",
+      "content": "Deny-by-default for safety peripherals; 16 configurable regions",
+      "test_ref": "tb/security/pmp_lite_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/pmp_lite.v:46",
+      "content": "Deny-by-default \u2014 unconfigured regions deny all access",
+      "test_ref": "tb/security/pmp_lite_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/pmp_lite.v:56",
+      "content": "Reset all regions to inactive (deny-by-default)",
+      "test_ref": "tb/security/pmp_lite_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/pmp_lite.v:76",
+      "content": "Deny-by-default; first matching region determines outcome",
+      "test_ref": "tb/security/pmp_lite_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/pmp_lite.v:83",
+      "content": "Deny by default",
+      "test_ref": "tb/security/pmp_lite_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/pmp_lite.v:99",
+      "content": "Write to read-only region = violation",
+      "test_ref": "tb/security/pmp_lite_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/security/smu.v:18",
+      "content": "AEGIS-SEC-SMU-001 \u2014 ARCHITECTURE.md \u00a74 (Safety Monitor)",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/smu.v:19",
+      "content": "Fault aggregation is combinational (1-cycle); safe-state trigger",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": "firmware/rt_test.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/smu.v:69",
+      "content": "Fault latch persists until explicitly acknowledged",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": "firmware/rt_test.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/security/smu.v:70",
+      "content": "AEGIS-SEC-SMU-002 \u2014 Fault latch persistence (ISO 26262-5:2018 \u00a78.4.3)",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/smu.v:81",
+      "content": "FSM ensures safe-state is requested within 2 cycles of threshold",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/security/smu.v:94",
+      "content": "AEGIS-SEC-SMU-003 \u2014 Severity classification per ISO 26262-5:2018",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/smu.v:113",
+      "content": "Latches highest-priority fault until acknowledged",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/smu.v:121",
+      "content": "Clear latch on acknowledge (ISO 26262-5:2018 \u00a78.4.3)",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/smu.v:125",
+      "content": "Latch first fault (prevents overwriting with lower-priority)",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": "firmware/rt_test.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/smu.v:129",
+      "content": "Update if new fault has higher severity",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/smu.v:138",
+      "content": "Bit-per-fault-source history for diagnostic analysis",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/security/smu.v:139",
+      "content": "AEGIS-SEC-SMU-004 \u2014 Fault history for ISO 26262-5 diagnostic",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/smu.v:154",
+      "content": "Counters track fault accumulation per severity level",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/smu.v:179",
+      "content": "Triggers safe-state when aggregation threshold is breached",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/security/smu.v:181",
+      "content": "AEGIS-SEC-SMU-005 \u2014 Safe-state trigger timing (ISO 26262-5:2018 \u00a78.4.3)",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/smu.v:191",
+      "content": "Check for threshold breach or software request",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/smu.v:210",
+      "content": "Assert safe-state request for power orchestrator",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/smu.v:216",
+      "content": "Hold safe-state request until acknowledged",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/smu.v:224",
+      "content": "Default prevents latch inference (ISO 26262-8:2018 \u00a78.4.3)",
+      "test_ref": "tb/security/smu_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/security/secure_boot_stub.v:13",
+      "content": "AEGIS-SEC-BOOT-001 \u2014 ARCHITECTURE.md \u00a74 (Secure Boot)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/secure_boot_stub.v:14",
+      "content": "Boot stub is read-only (OTP ROM); immutable after manufacture",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/secure_boot_stub.v:39",
+      "content": "Stub \u2014 always pass for Phase 1",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/security/crypto_accel_if.v:12",
+      "content": "AEGIS-SEC-CRYPTO-001 \u2014 ARCHITECTURE.md \u00a74 (Crypto)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/security/crypto_accel_if.v:13",
+      "content": "All crypto ops go through constant_time_wrapper",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/memory/scratchpad_bank.v:17",
+      "content": "AEGIS-MEM-SP-001 \u2014 ARCHITECTURE.md \u00a75 (Scratchpad)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/scratchpad_bank.v:18",
+      "content": "All writes go through ECC encoder; all reads through decoder",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/scratchpad_bank.v:64",
+      "content": "All reads are ECC-checked; corrected data available immediately",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/memory/ecc_scrubber.v:17",
+      "content": "AEGIS-MEM-SCR-001 \u2014 ARCHITECTURE.md \u00a75 (ECC Scrubber)",
+      "test_ref": "tb/memory/ecc_scrubber_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/ecc_scrubber.v:18",
+      "content": "Scrubber corrects latent single-bit errors before they accumulate",
+      "test_ref": "tb/memory/ecc_scrubber_tb.v",
+      "fw_ref": "firmware/rt_test.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/ecc_scrubber.v:57",
+      "content": "IDLE\u2192READ\u2192CHECK\u2192CORRECT\u2192IDLE cycle",
+      "test_ref": "tb/memory/ecc_scrubber_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/ecc_scrubber.v:95",
+      "content": "Read issued; data available next cycle (async read)",
+      "test_ref": "tb/memory/ecc_scrubber_tb.v",
+      "fw_ref": "firmware/syscalls.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/ecc_scrubber.v:101",
+      "content": "If single-bit error, correct and write back",
+      "test_ref": "tb/memory/ecc_scrubber_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/ecc_scrubber.v:115",
+      "content": "Write corrected data back to same address",
+      "test_ref": "tb/memory/ecc_scrubber_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/ecc_scrubber.v:121",
+      "content": "Default prevents latch inference",
+      "test_ref": "tb/memory/ecc_scrubber_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/memory/memory_mux.v:13",
+      "content": "AEGIS-MEM-MUX-001 \u2014 ARCHITECTURE.md \u00a79 (Memory Map)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/memory_mux.v:15",
+      "content": "CSR/Xdrone spaces are privilege-gated",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/memory_mux.v:67",
+      "content": "Memory map per ARCHITECTURE.md \u00a79.2",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/memory_mux.v:107",
+      "content": "Default 0 for unmapped regions",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/memory_mux.v:114",
+      "content": "Always ready (no backpressure)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/memory/ecc_secdec_32.v:18",
+      "content": "AEGIS-MEM-ECC-001 \u2014 ARCHITECTURE.md \u00a75 (ECC Protection)",
+      "test_ref": "tb/memory/ecc_secdec_32_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/ecc_secdec_32.v:19",
+      "content": "Single-bit errors corrected in 1 cycle; double-bit errors",
+      "test_ref": "tb/memory/ecc_secdec_32_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/ecc_secdec_32.v:63",
+      "content": "SECDED guarantees correction of single-bit errors and",
+      "test_ref": "tb/memory/ecc_secdec_32_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/ecc_secdec_32.v:126",
+      "content": "Syndrome identifies exact error position for single-bit errors",
+      "test_ref": "tb/memory/ecc_secdec_32_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/ecc_secdec_32.v:176",
+      "content": "Non-zero syndrome indicates error; syndrome value = error position",
+      "test_ref": "tb/memory/ecc_secdec_32_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/ecc_secdec_32.v:192",
+      "content": "SECDED classification logic:",
+      "test_ref": "tb/memory/ecc_secdec_32_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/memory/ecc_secdec_32.v:197",
+      "content": "AEGIS-MEM-ECC-002 \u2014 Error classification per ISO 26262-5:2018 \u00a78.4.3",
+      "test_ref": "tb/memory/ecc_secdec_32_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/ecc_secdec_32.v:205",
+      "content": "XOR the error bit position to flip the corrupted bit",
+      "test_ref": "tb/memory/ecc_secdec_32_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/ecc_secdec_32.v:254",
+      "content": "No data correction for check-bit errors",
+      "test_ref": "tb/memory/ecc_secdec_32_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/memory/scratchpad_ctrl.v:17",
+      "content": "AEGIS-MEM-SP-002 \u2014 ARCHITECTURE.md \u00a75 (Scratchpad Controller)",
+      "test_ref": "tb/memory/scratchpad_ctrl_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/scratchpad_ctrl.v:18",
+      "content": "Dual-bank allows simultaneous access + background scrubbing;",
+      "test_ref": "tb/memory/scratchpad_ctrl_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/scratchpad_ctrl.v:70",
+      "content": "Address MSB selects bank; each bank = 256 KB",
+      "test_ref": "tb/memory/scratchpad_ctrl_tb.v",
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/scratchpad_ctrl.v:94",
+      "content": "Dual-bank allows core access + scrubber on different banks",
+      "test_ref": "tb/memory/scratchpad_ctrl_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/scratchpad_ctrl.v:168",
+      "content": "Always ready (no backpressure in TCM)",
+      "test_ref": "tb/memory/scratchpad_ctrl_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/scratchpad_ctrl.v:172",
+      "content": "Any single/double error from either bank triggers SMU fault",
+      "test_ref": "tb/memory/scratchpad_ctrl_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/scratchpad_ctrl.v:179",
+      "content": "Scrubs one address per SCRUB_INTERVAL_CYCLES",
+      "test_ref": "tb/memory/scratchpad_ctrl_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/memory/scratchpad_ctrl.v:193",
+      "content": "Advance scrub address; wrap around",
+      "test_ref": "tb/memory/scratchpad_ctrl_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/power/isolation_cell_1bit.v:13",
+      "content": "AEGIS-PWR-ISO-001 \u2014 Power domain isolation (ISO 26262-5:2018 \u00a78.4.3)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/isolation_cell_1bit.v:14",
+      "content": "Isolation prevents undefined signals from powered-down domain",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/isolation_cell_1bit.v:29",
+      "content": "When iso_en=1, output clamps to CLAMP_VALUE regardless of input",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/isolation_cell_1bit.v:30",
+      "content": "When iso_en=0, signal passes through transparently",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/power/power_domain_if.v:13",
+      "content": "AEGIS-PWR-PDIF-001 \u2014 Power domain interface (ISO 26262-5:2018)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/power_domain_if.v:14",
+      "content": "All signals active-high for consistent control semantics",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/power/wake_sequencer.v:13",
+      "content": "AEGIS-PWR-WAKE-001 \u2014 Wake sequencing (ISO 26262-5:2018 \u00a78.4.3)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/wake_sequencer.v:14",
+      "content": "Power domain must stabilize before logic is enabled;",
+      "test_ref": null,
+      "fw_ref": "firmware/rt_test.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/wake_sequencer.v:39",
+      "content": "Start stabilization counter on wake request",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/wake_sequencer.v:44",
+      "content": "Stabilization period complete",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/power/power_orchestrator.v:18",
+      "content": "AEGIS-PWR-ORCH-001 \u2014 ARCHITECTURE.md \u00a76 (Power Management)",
+      "test_ref": "tb/power/power_orchestrator_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/power_orchestrator.v:19",
+      "content": "Safe-state transition is irreversible until external reset;",
+      "test_ref": "tb/power/power_orchestrator_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/power_orchestrator.v:71",
+      "content": "States are one-hot encoded for glitch-free transitions",
+      "test_ref": "tb/power/power_orchestrator_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/power_orchestrator.v:99",
+      "content": "Safe-state is highest priority; once entered, only reset exits",
+      "test_ref": "tb/power/power_orchestrator_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/power/power_orchestrator.v:101",
+      "content": "AEGIS-PWR-ORCH-002 \u2014 State transition timing (ISO 26262-5:2018 \u00a78.4.3)",
+      "test_ref": "tb/power/power_orchestrator_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/power_orchestrator.v:112",
+      "content": "SMU safe-state request has absolute priority",
+      "test_ref": "tb/power/power_orchestrator_tb.v",
+      "fw_ref": "firmware/rt_test.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/power_orchestrator.v:126",
+      "content": "Check SMU request even during sleep prep",
+      "test_ref": "tb/power/power_orchestrator_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/power_orchestrator.v:139",
+      "content": "SMU request can wake from sleep to safe-state",
+      "test_ref": "tb/power/power_orchestrator_tb.v",
+      "fw_ref": "firmware/rt_test.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/power_orchestrator.v:149",
+      "content": "Only external reset can exit safe-state",
+      "test_ref": "tb/power/power_orchestrator_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/power/power_orchestrator.v:150",
+      "content": "AEGIS-PWR-ORCH-003 \u2014 Irreversible safe-state (DO-254 \u00a75.3.1)",
+      "test_ref": "tb/power/power_orchestrator_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/power_orchestrator.v:153",
+      "content": "Remain in safe-state until external reset",
+      "test_ref": "tb/power/power_orchestrator_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/power_orchestrator.v:160",
+      "content": "Default prevents latch inference (ISO 26262-8:2018 \u00a78.4.3)",
+      "test_ref": "tb/power/power_orchestrator_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/power_orchestrator.v:171",
+      "content": "Signals are derived combinationally from state for immediate effect",
+      "test_ref": "tb/power/power_orchestrator_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/power_orchestrator.v:182",
+      "content": "Isolation clamps outputs to safe defaults (0)",
+      "test_ref": "tb/power/power_orchestrator_tb.v",
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/power_orchestrator.v:186",
+      "content": "Power domain always-on during SLEEP (retention requires power)",
+      "test_ref": "tb/power/power_orchestrator_tb.v",
+      "fw_ref": "firmware/rt_test.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/power/retention_reg_32.v:13",
+      "content": "AEGIS-PWR-RET-001 \u2014 Retention register (ISO 26262-5:2018 \u00a78.4.3)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/retention_reg_32.v:14",
+      "content": "Retention register preserves critical state during power gating;",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/retention_reg_32.v:38",
+      "content": "Shadow register retains value even when main power is gated",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/retention_reg_32.v:46",
+      "content": "Restore from shadow register on wake",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/retention_reg_32.v:54",
+      "content": "Shadow captures main_reg only when retention_en rises (edge-triggered save)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/retention_reg_32.v:64",
+      "content": "Capture on rising edge of retention enable",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/power/retention_reg_32.v:74",
+      "content": "Detect mismatch between main and shadow after restore",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/interconnect/iopmp_ctrl.v:13",
+      "content": "AEGIS-SEC-IOP-001 \u2014 ARCHITECTURE.md \u00a78 (IOPMP)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/interconnect/iopmp_ctrl.v:14",
+      "content": "Deny-by-default for DMA to safety peripherals",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/interconnect/axi_lite_rt_slice.v:13",
+      "content": "AEGIS-INT-AXI-001 \u2014 ARCHITECTURE.md \u00a78 (Interconnect)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/interconnect/axi_lite_rt_slice.v:15",
+      "content": "RT traffic has absolute priority over all other masters",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/interconnect/axi_lite_rt_slice.v:88",
+      "content": "RT always granted in Phase 1 (single master)",
+      "test_ref": null,
+      "fw_ref": "firmware/main.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/interconnect/axi_timeout_monitor.v:13",
+      "content": "AEGIS-INT-AXI-002 \u2014 ARCHITECTURE.md \u00a78 (Timeout)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/interconnect/axi_timeout_monitor.v:14",
+      "content": "Prevents deadlock from unresponsive slaves",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/interconnect/axi_timeout_monitor.v:43",
+      "content": "Timeout \u2014 trigger SMU fault",
+      "test_ref": null,
+      "fw_ref": "firmware/rt_test.c"
+    },
+    {
+      "tag": "CERT",
+      "rtl_ref": "rtl/interconnect/tt_arbiter_4master.v:13",
+      "content": "AEGIS-INT-TT-001 \u2014 ARCHITECTURE.md \u00a78 (Interconnect)",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/interconnect/tt_arbiter_4master.v:15",
+      "content": "Fixed schedule prevents starvation and non-deterministic latency",
+      "test_ref": null,
+      "fw_ref": null
+    },
+    {
+      "tag": "SAFETY",
+      "rtl_ref": "rtl/interconnect/tt_arbiter_4master.v:28",
+      "content": "Fixed priority: master 0 (RT) > master 1 (Security) >",
+      "test_ref": null,
+      "fw_ref": null
+    }
+  ]
+}

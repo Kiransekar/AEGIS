@@ -1,0 +1,18 @@
+[options]
+mode bmc
+depth 10
+
+[script]
+read_verilog -sv ../../rtl/core/rt_exception_handler.v
+prep -top rt_exception_handler
+
+[files]
+../../rtl/core/rt_exception_handler.v
+
+[engines]
+smtbmc z3
+
+[tasks]
+mtvec_test
+    assert property (@(posedge i_clk) disable iff (!i_rst_n))
+        o_mtvec[1:0] == 2'b00;

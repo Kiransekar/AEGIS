@@ -2,33 +2,40 @@
 # AEGIS-RV Firmware Build Makefile
 #===============================================================================
 
+ISA     ?= rv32imacf
+ABI     ?= ilp32
+
 CROSS_COMPILE ?= riscv64-unknown-elf-
 CC      = $(CROSS_COMPILE)gcc
 AS      = $(CROSS_COMPILE)as
 LD      = $(CROSS_COMPILE)ld
 OBJCOPY = $(CROSS_COMPILE)objcopy
 
-CFLAGS  = -march=rv32imac_zicsr -mabi=ilp32 -O2 -Wall \
+CFLAGS  = -march=$(ISA) -mabi=$(ABI) -mcmodel=medlow -O2 -Wall \
           -fno-builtin -fno-common -static -nostdlib \
           -DSAFETY_MODE -DXDRONE_EXT
 
-ASFLAGS = -march=rv32imac_zicsr -mabi=ilp32
+ASFLAGS = -march=$(ISA) -mabi=$(ABI)
 
 LDFLAGS = -T link.ld -nostdlib -static
 
-TARGET  = build/rt_test.elf
+TARGET  = build/firmware.elf
 
-SOURCES = boot.S rt_test.c
+SRCS    = boot.S main.c syscalls.c rt_test.c
 
 .PHONY: all clean
 
-all: $(TARGET)
+all: $(TARGET) build/firmware.hex
 
-$(TARGET): $(SOURCES) link.ld
+$(TARGET): $(SRCS) link.ld
 	@mkdir -p build
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SOURCES)
-	$(OBJCOPY) -O binary $@ build/rt_test.bin
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SRCS)
+	$(OBJCOPY) -O binary $@ build/firmware.bin
 	@echo "[✓] Firmware built: $(TARGET)"
+
+build/firmware.hex: $(TARGET)
+	$(OBJCOPY) -O verilog $< $@
+	@echo "[✓] Verilog hex generated: build/firmware.hex"
 
 clean:
 	rm -rf build/

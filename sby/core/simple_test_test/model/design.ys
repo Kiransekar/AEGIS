@@ -1,0 +1,8 @@
+# running in simple_test_test/src/
+read_verilog -sv rt_exception_handler.v
+prep -top rt_exception_handler
+
+hierarchy -smtcheck
+rename -witness
+write_jny -no-connections ../model/design.json
+write_rtlil ../model/design.il

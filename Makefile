@@ -143,6 +143,29 @@ sim:
 sim_all_phase1: sim
 sim_all_phase2: sim_rt_decoder sim_rt_fpu sim_rt_muldiv sim_rt_watchdog sim_aegis_rt_core
 
+# Phase 1 Boot Validation with Icarus Verilog
+.PHONY: sim_boot
+sim_boot:
+	@echo "[→] Phase 1: Boot Validation with Icarus Verilog"
+	@if [ ! -f $(FW_DIR)/build/firmware.hex ]; then \
+		echo "[!] firmware.hex not found, building firmware..."; \
+		$(MAKE) -C $(FW_DIR) build/firmware.hex || exit 1; \
+	fi
+	@mkdir -p $(SIM_DIR)
+	iverilog -g2012 tb/core/aegis_boot_standalone_tb.v -o $(SIM_DIR)/boot_sim 2>&1 | tee $(SIM_DIR)/boot_compile.log
+	@if grep -q error $(SIM_DIR)/boot_compile.log; then \
+		echo "[✗] Compilation failed"; \
+		exit 1; \
+	fi
+	@echo "[→] Running boot simulation..."
+	vvp $(SIM_DIR)/boot_sim 2>&1 | tee $(SIM_DIR)/boot.log
+	@if grep -q "PASS: Phase 1" $(SIM_DIR)/boot.log; then \
+		echo "[✓] Phase 1 Boot Validation PASSED"; \
+	else \
+		echo "[✗] Phase 1 Boot Validation FAILED"; \
+		exit 1; \
+	fi
+
 sim_%:
 	@tb_file=$$(find $(TB_DIR) -name "$*_tb.v" | head -1); \
 	if [ -z "$$tb_file" ]; then \

@@ -50,3 +50,15 @@ firmware/*.map
 # PDK (large, cloned separately)
 skywater-pdk/
 third_party/skywater-pdk/
+
+# External tools (large, cloned/built separately)
+SymbiYosys/
+symbiyosys_env/
+yices2-Yices-2.6.4/
+Yices-2.6.4.tar.gz
+riscv-arch-test/
+riscv-isa-sim/
+
+# Synthesis outputs (large netlist tracked via synth.log)
+outputs/aegis_rt_core_syn.v
+outputs/synth.log

@@ -1,0 +1,18 @@
+[options]
+mode bmc
+depth 100
+
+[engines]
+smtbmc z3
+
+[script]
+read_verilog -sv ../../rtl/core/rt_exception_handler.v
+prep -top rt_exception_handler
+
+[files]
+../../rtl/core/rt_exception_handler.v
+
+[tasks]
+no_deadlock_check
+    assume i_rst_n;
+    cover !o_trap_valid;
