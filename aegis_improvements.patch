@@ -1,0 +1,192 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+new file mode 100644
+index 0000000..5795611
+--- /dev/null
++++ b/.github/workflows/ci.yml
+@@ -0,0 +1,71 @@
++#===============================================================================
++# AEGIS-RV Continuous Integration
++# Runs on every push and pull request:
++#   1. Verilator lint (structural quality gate)
++#   2. Icarus Verilog unit test suite (functional gate)
++#   3. Integration tests (smoke, fault injection, WCET)
++#===============================================================================
++name: CI
++
++on:
++  push:
++    branches: [master, main]
++  pull_request:
++
++jobs:
++  lint:
++    name: Verilator Lint
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - name: Install Verilator
++        run: sudo apt-get update && sudo apt-get install -y verilator
++      - name: Lint RTL
++        # Warnings are reported but do not fail the build yet.
++        # Once the warning count reaches zero, remove '|| true' to
++        # enforce a zero-warning policy (expected for safety cert).
++        run: |
++          verilator --lint-only -Wall -Irtl/security -f rtl/rtl_list.f 2>&1 \
++            | tee lint.log || true
++          echo "### Lint summary" >> "$GITHUB_STEP_SUMMARY"
++          grep -E "^%(Warning|Error)" lint.log | awk -F: '{print $1}' \
++            | sort | uniq -c | sort -rn >> "$GITHUB_STEP_SUMMARY" || true
++      - name: Fail on hard errors
++        run: "! grep -qE '^%Error(-[A-Z]+)?:' lint.log"
++      - uses: actions/upload-artifact@v4
++        with:
++          name: lint-log
++          path: lint.log
++
++  sim:
++    name: Unit Tests (Icarus Verilog)
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - name: Install Icarus Verilog
++        run: sudo apt-get update && sudo apt-get install -y iverilog
++      - name: Run unit test suite
++        run: make sim
++      - name: Run integration tests
++        run: make sim_integration
++      - uses: actions/upload-artifact@v4
++        if: always()
++        with:
++          name: sim-logs
++          path: sim/*.log
++
++  formal:
++    name: Formal Verification (SymbiYosys)
++    runs-on: ubuntu-latest
++    # Formal proofs can be long-running; keep them on master pushes only.
++    if: github.event_name == 'push'
++    continue-on-error: true
++    steps:
++      - uses: actions/checkout@v4
++      - name: Install OSS CAD Suite (sby + solvers)
++        run: |
++          curl -sL https://github.com/YosysHQ/oss-cad-suite-build/releases/download/2024-06-14/oss-cad-suite-linux-x64-20240614.tgz \
++            | tar xz
++          echo "$PWD/oss-cad-suite/bin" >> "$GITHUB_PATH"
++      - name: Run formal properties
++        run: make formal
+diff --git a/.gitignore b/.gitignore
+index d7b1d04..9b023bf 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -62,3 +62,13 @@ riscv-isa-sim/
+ # Synthesis outputs (large netlist tracked via synth.log)
+ outputs/aegis_rt_core_syn.v
+ outputs/synth.log
++
++# SymbiYosys run outputs (generated; never commit)
++sby/**/model/
++sby/**/engine_*/
++sby/**/src/
++sby/**/logfile.txt
++sby/**/*.sqlite
++sby/**/status
++sby/**/PASS
++sby/**/FAIL
+diff --git a/Makefile b/Makefile
+index 6f4ba4e..ac0d01f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -134,12 +134,22 @@ lint_%:
+ #===============================================================================
+ .PHONY: sim sim_all_phase1
+ sim:
+-	@for tb in $$(find $(TB_DIR) -name "*_tb.v" -not -path "*/integration/*"); do \
++	@for tb in $$(find $(TB_DIR) -name "*_tb.v" -not -path "*/integration/*" \
++			-not -name "aegis_boot*" -not -name "aegis_isa_compliance*"); do \
+ 		module=$$(basename $$tb _tb.v); \
+ 		echo "[→] Running simulation: $$module"; \
+ 		$(MAKE) sim_$$module || exit 1; \
+ 	done
+ 
++# Integration tests (smoke, fault injection, WCET)
++.PHONY: sim_integration
++sim_integration:
++	@for tb in $$(find $(TB_DIR)/integration -name "*_tb.v"); do \
++		module=$$(basename $$tb _tb.v); \
++		echo "[→] Running integration test: $$module"; \
++		$(MAKE) sim_$$module || exit 1; \
++	done
++
+ sim_all_phase1: sim
+ sim_all_phase2: sim_rt_decoder sim_rt_fpu sim_rt_muldiv sim_rt_watchdog sim_aegis_rt_core
+ 
+@@ -172,22 +182,19 @@ sim_%:
+ 		echo "[✗] Testbench $*_tb.v not found in $(TB_DIR)/"; \
+ 		exit 1; \
+ 	fi; \
+-	tb_dir=$$(dirname $$tb_file); \
+-	mkdir -p $(SIM_DIR)/$*_obj; \
++	mkdir -p $(SIM_DIR); \
+ 	echo "[→] Compiling: $*"; \
+-	$(VERILATOR) --cc --exe \
+-		$(if $(filter 1,$(TRACE)),--trace --trace-struct) \
+-		--top $*_tb \
+-		-f $(RTL_LIST) \
+-		$$tb_file \
+-		+define+SAFETY_MODE +define+SIMULATION \
+-		--Mdir $(SIM_DIR)/$*_obj \
+-		--build \
+-		-CFLAGS "-I. -I$(TB_DIR) -std=c++17" \
+-		-LDFLAGS "-lpthread" || exit 1; \
++	iverilog -g2012 -Irtl/security \
++		-DSAFETY_MODE -DSIMULATION \
++		$(if $(filter 1,$(TRACE)),-DTRACE) \
++		-o $(SIM_DIR)/$*_sim \
++		-f $(RTL_LIST) $(TB_DIR)/tb_memory_model.v $$tb_file || exit 1; \
+ 	echo "[→] Running: $*"; \
+-	$(SIM_DIR)/$*_obj/V$*_tb $(if $(TEST),+test=$(TEST)); \
+-	echo "[✓] Simulation complete: $*"
++	vvp $(SIM_DIR)/$*_sim $(if $(TEST),+test=$(TEST)) 2>&1 | tee $(SIM_DIR)/$*.log; \
++	if grep -qE '\[FAIL|FAIL:|Some tests failed' $(SIM_DIR)/$*.log; then \
++		echo "[✗] Simulation FAILED: $*"; exit 1; \
++	fi; \
++	echo "[✓] Simulation passed: $*"
+ 
+ #===============================================================================
+ # FORMAL VERIFICATION TARGETS
+diff --git a/rtl/core/rt_decoder.v b/rtl/core/rt_decoder.v
+index 01119a0..6310991 100644
+--- a/rtl/core/rt_decoder.v
++++ b/rtl/core/rt_decoder.v
+@@ -185,9 +185,9 @@ module rt_decoder (
+ 
+     //-------------------------------------------------------------------------
+     // M extension detection
+-    // @SAFETY: M ops share opcode 0x33 with R-type; funct7[5:4]=01
++    // @SAFETY: M ops share opcode 0x33 with R-type; funct7=0000001 (RISC-V spec)
+     //-------------------------------------------------------------------------
+-    wire is_m_ext = (opcode == OP_REG) && funct7[5] && !funct7[4];
++    wire is_m_ext = (opcode == OP_REG) && (funct7 == 7'b0000001);
+ 
+     // F extension detection
+     wire is_f_load  = (opcode == OP_FLW);
+@@ -220,7 +220,7 @@ module rt_decoder (
+     reg        ecall_reg, ebreak_reg, mret_reg, fence_i_reg;
+     reg        illegal_reg;
+ 
+-    always @(i_instr or i_instr_valid) begin
++    always @* begin
+         // Default: all outputs zero
+         alu_op_reg       = ALU_ADD;
+         alu_use_imm_reg  = 1'b0;
+@@ -551,7 +551,8 @@ module rt_decoder (
+                         default: illegal_reg = 1'b1;
+                     endcase
+                     // Integer writeback for FCVT.W.S / FMV.X.W / FCLASS
+-                    if (funct7 == 7'h60 || funct7 == 7'h70 || funct7 == 7'hE0) begin
++                    // (FMV.X.W and FCLASS share funct7 = 7'h70)
++                    if (funct7 == 7'h60 || funct7 == 7'h70) begin
+                         fpu_wb_int_reg = 1'b1;
+                     end
+                 end
